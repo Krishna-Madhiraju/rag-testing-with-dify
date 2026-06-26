@@ -74,8 +74,10 @@ rag-demo/
 │       ├── .env.example    # Template with all available settings
 │       └── docker-compose.yaml
 ├── docs/
-│   ├── dify-setup.md       # Step-by-step Dify configuration guide
-│   ├── glossary.md         # RAG terminology reference
+│   ├── dify-setup.md               # Step-by-step Dify configuration guide
+│   ├── glossary.md                 # RAG terminology reference
+│   ├── functional-test-scenarios.md # 54 functional test cases
+│   ├── rag-testing-scenarios.md    # Practical Q&A on real-world testing challenges
 │   └── sample-data/
 │       └── orion-technologies-employee-handbook.pdf  # Test document
 └── README.md               # This file
@@ -428,6 +430,7 @@ docker compose up -d       # start again from scratch
 - [RAG Terminology Glossary](docs/glossary.md) — every term you will encounter, explained in plain language
 - [Dify Setup Guide](docs/dify-setup.md) — step-by-step configuration for Knowledge Base and Chatbot
 - [Functional Test Scenarios](docs/functional-test-scenarios.md) — 54 test cases covering in-scope, out-of-scope, paraphrase, adversarial, and ambiguous queries
+- [RAG Testing Scenarios](docs/rag-testing-scenarios.md) — practical Q&A on testing document updates, model swaps, large corpora, daily-changing data, mixed file formats, temperature changes, chunk size, and overlap optimisation
 - [Dify Documentation](https://docs.dify.ai)
 - [Dify GitHub Repository](https://github.com/langgenius/dify)
 - [What is RAG? (AWS explainer)](https://aws.amazon.com/what-is/retrieval-augmented-generation/)
