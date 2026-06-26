@@ -1,0 +1,9 @@
+# Dify platform clone — tracked separately at github.com/langgenius/dify
+dify/
+
+# Environment files with secrets
+.env
+*.env
+
+# macOS
+.DS_Store
