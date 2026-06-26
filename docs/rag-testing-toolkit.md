@@ -192,6 +192,73 @@ To score a whole golden dataset at once, collect samples into an `EvaluationData
 
 > RAGAS scores are produced by an LLM judge, so they cost money per run and vary slightly between runs. Pin the judge model and run faithfulness as a pre-release gate, not on every commit.
 
+### Generation-quality metrics: BLEU, ROUGE-L, GPTScore
+
+A common point of confusion: where do BLEU, ROUGE-L, and GPTScore fit next to RAGAS? The key is that **these three aren't tools or frameworks — they're individual *metrics*.** RAGAS is a framework that bundles metrics; BLEU and ROUGE-L you compute with a small library, and GPTScore is a technique (let an LLM grade the answer). So they don't sit *beside* RAGAS — they sit *inside* this eval-tooling level, in one specific slice of it.
+
+**First thing to nail down: they measure the *answer*, not retrieval.** Everything at this level splits into two questions:
+
+| Question | Metrics | What they look at |
+|---|---|---|
+| Did retrieval fetch the right chunks? | context precision/recall, recall@K | the **chunks** |
+| Is the generated answer any good? | **BLEU, ROUGE-L, GPTScore**, RAGAS faithfulness/relevancy | the **answer text** |
+
+BLEU, ROUGE-L, and GPTScore live entirely in that second row. They say nothing about whether retrieval worked — they only judge the answer the model wrote. They're *generation-quality* metrics, blind to the retrieval half of RAG.
+
+**Within answer quality, they sit on a cheap ↔ meaningful axis** — and this is the part that matters for a tester:
+
+| Metric | How it works | Needs a reference answer? | Cost | Catches | Misses |
+|---|---|---|---|---|---|
+| **BLEU** | n-gram overlap with a reference answer | **Yes** | Free, instant, deterministic | Exact phrasing drift | Synonyms — "car" vs "automobile" score zero |
+| **ROUGE-L** | longest common subsequence vs reference | **Yes** | Free, instant, deterministic | Whether key facts got covered | Paraphrases, meaning |
+| **GPTScore** | an LLM judges the answer's quality | No (or optional) | $$ per call, non-deterministic | Meaning, paraphrase, **hallucination** | Consistency — judge varies, prompt-sensitive |
+
+BLEU and ROUGE-L are **lexical** — they compare *words*, so they need a known-good reference answer to compare against, which means they sit downstream of your golden dataset ([Q16](rag-testing-scenarios.md)). GPTScore is **semantic** — an LLM reads the answer and rates it, so it catches the things word-matching can't.
+
+**How they relate to RAGAS:** RAGAS's faithfulness and answer-relevancy metrics are GPTScore-style metrics under the hood — LLM-as-judge, just specialised for RAG (faithfulness judges the answer *against the retrieved context*). So GPTScore is the general technique "let an LLM grade the answer," and RAGAS faithfulness/relevancy is that same technique packaged and made retrieval-aware. BLEU and ROUGE-L are the older, cheaper, retrieval-blind cousins that just count word overlap.
+
+**When a tester reaches for each:**
+
+- **BLEU + ROUGE-L** → cheap, deterministic, run **on every commit** in CI. A fast regression tripwire: "did the answer text drift from last week's known-good answer?" No LLM cost, same result every run. You compute them with a small library (e.g. Hugging Face `evaluate`, `sacrebleu`, or `rouge-score` — check the current version before pinning).
+- **GPTScore (and RAGAS)** → expensive, semantic, run as a **release gate** or quality audit. This is what catches a fluent hallucination that BLEU and ROUGE-L would happily wave through.
+
+**The most useful habit: run all three and watch where they disagree.** When BLEU says "drifted" but GPTScore says "still good," the model just paraphrased — fine. When BLEU says "matches" but GPTScore says "unfaithful," something subtler is wrong. The *disagreement* between the cheap lexical metrics and the semantic one is exactly where the interesting failures hide.
+
+**So, placing them on the map:**
+- Retrieval quality → RAGAS context precision/recall
+- Answer quality, cheap regression → BLEU, ROUGE-L
+- Answer quality, semantic / hallucination → GPTScore, RAGAS faithfulness
+
+They complement RAGAS rather than replacing it: RAGAS covers retrieval *and* generation for RAG specifically, while BLEU/ROUGE-L/GPTScore are general text-generation metrics you'd use to track answer quality and drift.
+
+### Why do you need multiple tools? Can't one do everything?
+
+This is the question everyone asks once they see four tool names, and it's a fair one. The honest answer: **no single tool does everything well — but not because the tools are weak. It's because "evaluate a RAG application" is secretly five different jobs, and each job needs a different kind of measurement.**
+
+Once you see the structure, the tool sprawl stops looking like soup:
+
+| The question you're really asking | What it measures | Where it's handled |
+|---|---|---|
+| Did retrieval fetch the right chunks? | Retrieval quality | context precision/recall, recall@K — RAGAS |
+| Is the answer grounded and on-topic? | Generation quality | faithfulness, answer relevancy — RAGAS |
+| Can it be tricked or made unsafe? | Safety / adversarial | injection, jailbreak, toxicity — Promptfoo |
+| Did it get *worse* since last release? | Regression / gating | pass/fail in CI — DeepEval + pytest |
+| Is it drifting in production right now? | Live monitoring | tracing over time — TruLens |
+
+A tool is usually built to nail one or two of these brilliantly. That's why teams "run two" — they pick best-of-breed for the jobs they care about most, not because any single tool is broken.
+
+**So can one tool do it all? Almost — with a catch.** The closest to an everything-tool is **DeepEval**: RAG metrics *and* safety metrics *and* a pytest runner. You could run a whole eval program on it alone and be fine. But "can" and "best" differ along three independent axes, and no single tool tops all three at once:
+
+1. **What it measures** — retrieval vs generation vs safety are genuinely different math.
+2. **How you run it** — a browser (manual), pytest (CI gate), a CLI (red-team), or a live trace (monitoring). A tool built for production tracing is awkward as a pytest gate, and vice versa.
+3. **Whether it needs ground truth** — faithfulness needs none; context recall needs a labelled golden dataset. Same tool, different prerequisites.
+
+A tool can be excellent on one axis and mediocre on another. That's the real reason "one tool to rule them all" doesn't quite exist — not capability gaps, but that these are differently *shaped* problems.
+
+**The part no tool does for you.** The hardest, most valuable piece is tool-agnostic: building a good golden dataset (the right questions, correct expected answers, known source chunks — see [Q16](rag-testing-scenarios.md)). Every tool here just *runs* against that dataset. Garbage dataset, garbage scores, no matter the tool. So the test *design* matters far more than the tool *choice* — which is good news, because design is exactly what a tester is good at.
+
+**The practical takeaway:** you don't need a toolbox to start. Manual testing plus **RAGAS and pytest** is a complete eval setup for this project. The other tools are specialists you bring in only when a specific scenario outgrows what RAGAS measures — Promptfoo for adversarial (Q15), DeepEval for a hard CI gate (Q17), TruLens for production monitoring. Not day-one purchases.
+
 ### Is RAGAS the best tool? When to reach for something else
 
 RAGAS is the best *starting* and *primary* tool for RAG-specific metrics, but it isn't the only one, and it isn't built for every job. Teams shipping real RAG usually run **two** tools — RAGAS for the metrics, plus a test-runner. Here's the honest map:
