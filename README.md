@@ -427,6 +427,7 @@ docker compose up -d       # start again from scratch
 
 - [RAG Terminology Glossary](docs/glossary.md) — every term you will encounter, explained in plain language
 - [Dify Setup Guide](docs/dify-setup.md) — step-by-step configuration for Knowledge Base and Chatbot
+- [Functional Test Scenarios](docs/functional-test-scenarios.md) — 54 test cases covering in-scope, out-of-scope, paraphrase, adversarial, and ambiguous queries
 - [Dify Documentation](https://docs.dify.ai)
 - [Dify GitHub Repository](https://github.com/langgenius/dify)
 - [What is RAG? (AWS explainer)](https://aws.amazon.com/what-is/retrieval-augmented-generation/)
