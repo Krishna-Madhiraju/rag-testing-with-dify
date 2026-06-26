@@ -258,35 +258,44 @@ These are the knobs you adjust when tuning a RAG system. Know what each one does
 
 ## 7. Likely Interview Questions — with model answers
 
-**Quick-scan index — 27 questions:**
+**Quick-scan index — 36 questions:**
 
 1. Can you explain what RAG is?
 2. What is the ingestion pipeline and what can go wrong?
 3. What is the difference between a retrieval failure and a hallucination?
-4. How would you test for hallucination?
-5. What makes a good system prompt for a RAG app?
-6. What is the RAG Triad and why does it matter?
-7. What would you include in a golden dataset?
-8. How do chunk size and Top-K interact?
-9. What is the difference between BLEU and RAGAS faithfulness?
-10. How do you test a RAG system after the knowledge base is updated?
-11. What does temperature do and how does it affect testing?
-12. How would you test that the system refuses out-of-scope questions?
-13. What is the difference between context precision and context recall in RAGAS?
-14. What are the different RAG architectures and how does each one affect testing?
-15. What is reranking and when would you use it?
-16. How would you choose an embedding model, and what happens if you swap it mid-project?
-17. How would you debug a RAG system that is producing poor quality answers?
-18. How would you compare two RAG configurations to decide which is better?
-19. How would you build a golden dataset from scratch?
-20. What security risks are specific to RAG systems and how do you test them?
-21. How do you test RAG performance and what degrades at scale?
-22. What is HyDE and query expansion, and when would you use them?
-23. What is the difference between cosine similarity, dot product, and L2 distance?
-24. How would you fit RAG testing into a CI/CD pipeline?
-25. How is RAG different from fine-tuning, and when would you use each?
-26. How does testing change when your RAG system handles multiple formats?
-27. What tools have you used for RAG testing, and how do you choose between them?
+4. How do you handle non-determinism — the same query can return different answers each run?
+5. How would you test for hallucination?
+6. What makes a good system prompt for a RAG app?
+7. What is the RAG Triad and why does it matter?
+8. What would you include in a golden dataset?
+9. How do chunk size and Top-K interact?
+10. What are the different chunking strategies and how do you choose between them?
+11. What is the difference between BLEU and RAGAS faithfulness?
+12. What is BERTScore and when would you use it?
+13. How do you test a RAG system after the knowledge base is updated?
+14. What does temperature do and how does it affect testing?
+15. How would you test that the system refuses out-of-scope questions?
+16. What happens when two documents contradict each other, and how do you test it?
+17. What is the difference between context precision and context recall in RAGAS?
+18. What do you do when RAGAS scores fall below the release threshold?
+19. What are the different RAG architectures and how does each one affect testing?
+20. What is reranking and when would you use it?
+21. What is context compression and when is it used?
+22. How would you choose an embedding model, and what happens if you swap it mid-project?
+23. What do you test when the LLM itself is swapped for a different model?
+24. How would you debug a RAG system that is producing poor quality answers?
+25. How would you compare two RAG configurations to decide which is better?
+26. How would you build a golden dataset from scratch?
+27. What security risks are specific to RAG systems and how do you test them?
+28. How do you test RAG performance and what degrades at scale?
+29. What is HyDE and query expansion, and when would you use them?
+30. What is the difference between cosine similarity, dot product, and L2 distance?
+31. How would you fit RAG testing into a CI/CD pipeline?
+32. What is the difference between online and offline RAG evaluation?
+33. How is RAG different from fine-tuning, and when would you use each?
+34. How does testing change when your RAG system handles multiple formats?
+35. What tools have you used for RAG testing, and how do you choose between them?
+36. Where do you start when joining a new RAG project that has no existing test suite?
 
 ---
 
@@ -315,6 +324,22 @@ The ingestion pipeline is the process that prepares documents before any retriev
 ### "What is the difference between a retrieval failure and a hallucination?"
 
 Retrieval failure is upstream — the wrong chunk was returned, so the LLM never had the right information to begin with. Hallucination is downstream — the correct chunk was retrieved, but the LLM produced an answer not supported by it, either ignoring the context or blending in knowledge from training. In Dify, you tell them apart by checking the citation block: if the retrieved chunk contains the correct answer, the problem is generation; if it doesn't, the problem is retrieval.
+
+---
+
+### "How do you handle non-determinism — the same query can return different answers each run?"
+
+Non-determinism in RAG comes from two sources: the generation layer (the LLM with temperature > 0 produces different wording each run) and, at scale, the retrieval layer (approximate nearest-neighbour search can occasionally return slightly different rankings on repeated calls).
+
+The practical approach is to separate what you *assert on* from what you *measure*.
+
+**For retrieval assertions, assert on facts not phrasing.** "Does the response contain '5%'" is a stable assertion. "Does the response say 'Orion matches 100% of your contributions up to 5% of base salary'" is fragile — it fails on any valid paraphrase. Fact-based assertions tolerate wording variation while still catching genuinely wrong answers.
+
+**For generation quality, use thresholds not fixed scores.** BLEU and ROUGE-L scores vary slightly between runs at temperature > 0. Run the golden dataset several times at your configured temperature, find the natural variance, and set your regression threshold below the minimum acceptable value — not at a single observed number.
+
+**For truly deterministic test runs, set temperature to 0.** This eliminates generation randomness while keeping real retrieval behaviour. Use this for scripted regression tests; use your normal temperature for RAGAS quality scoring so results reflect production conditions.
+
+The deeper principle: RAG tests produce distributions, not single pass/fail values. A single failing run is a data point — run it three times before raising a defect. Consistent failures across runs are real; one-off failures at temperature > 0 are noise.
 
 ---
 
@@ -358,9 +383,37 @@ They both affect what ends up in the context window. Large chunks + high Top-K c
 
 ---
 
+### "What are the different chunking strategies and how do you choose between them?"
+
+There are four main approaches, each with a different trade-off between simplicity and retrieval quality.
+
+**Fixed-size** splits at every N tokens regardless of sentence or paragraph boundaries. Simple and fast to implement, but can cut sentences mid-way — producing chunks that contain incomplete thoughts. Good as a starting point for any new system.
+
+**Sentence-aware** splits at sentence endings. Produces coherent, complete-thought chunks. The downside is variable chunk size — a paragraph with long sentences produces much larger chunks than one with short ones, making Top-K comparisons less predictable.
+
+**Semantic** groups sentences with similar meaning into the same chunk using an embedding model during indexing. Produces the highest-quality chunks for retrieval but requires an extra embedding pass at ingestion — slower and more expensive to build. Best for documents with no clear structural markers such as continuous prose or transcripts.
+
+**Parent-child** stores two sizes for every passage: a small child chunk for retrieval (precise match) and a larger parent chunk that contains it for generation (full context). When a child is matched, the parent is sent to the LLM. This gives you the precision of small chunks and the context of large ones — but doubles storage and adds indexing complexity.
+
+**How to choose:** start with fixed-size and measure recall@K on your golden dataset. If boundary-crossing queries fail — the answer sits at a chunk edge and neither chunk alone is enough — add overlap or switch to sentence-aware. If semantic paraphrase queries still fail after that, try semantic chunking. Parent-child is worth the complexity only when both retrieval precision and answer completeness are non-negotiable in production.
+
+---
+
 ### "What is the difference between BLEU and RAGAS faithfulness?"
 
 BLEU is lexical and deterministic — it checks word overlap between the generated answer and a reference. It's fast and free. RAGAS faithfulness is semantic and uses an LLM judge — it checks whether every claim in the answer is backed by the retrieved context, regardless of how it's phrased. They test different things: BLEU catches answer drift between runs; faithfulness catches hallucination. In a well-run pipeline you use both — BLEU on every commit, faithfulness at release gates.
+
+---
+
+### "What is BERTScore and when would you use it?"
+
+BERTScore is a semantic similarity metric. Instead of counting word overlap like BLEU and ROUGE, it uses a BERT-based model to compare generated and reference answers at the token level — each token in the generated answer is matched to the most similar token in the reference, using embeddings.
+
+The practical result: "car" and "automobile" score highly similar in BERTScore. "The return window is 30 days" and "You have a month to return items" score reasonably close. Both pairs score zero in BLEU and ROUGE because there is no word overlap.
+
+**When to use it:** BERTScore fills the gap between lexical metrics (BLEU/ROUGE — fast and free but blind to paraphrases) and LLM-as-judge (semantic and accurate but expensive per query). It is faster and cheaper than a full RAGAS run while being more semantically aware than BLEU. Reach for it when your system naturally produces varied phrasing and BLEU scores are consistently low despite answers that are factually correct.
+
+**Limitation:** BERTScore still needs a reference answer — it cannot run without a golden dataset. And it cannot detect hallucination the way faithfulness can — it measures similarity to a reference, not grounding in retrieved context. The right combination is: BLEU/ROUGE for fast drift detection on every commit, BERTScore for semantic regression when phrasing varies, RAGAS faithfulness for hallucination gating at release.
 
 ---
 
@@ -382,9 +435,43 @@ Build a dedicated set of queries the knowledge base has no answer for, covering 
 
 ---
 
+### "What happens when two documents contradict each other, and how do you test it?"
+
+When two indexed chunks contain conflicting facts — one says the refund window is 30 days, another says 45 — both may be retrieved for the same query. What the LLM does with them depends on the system prompt, the model, and where in the context window each chunk lands. Most models will attempt to blend, average, or silently pick one. None of those behaviours is correct.
+
+There are three specific failure modes to watch for:
+
+**Blending** — the LLM produces an answer that averages the two ("somewhere between 30 and 45 days"). Wrong, and stated confidently.
+
+**Silent preference** — the LLM picks one chunk without flagging the conflict. The answer is either right or wrong by chance depending on which chunk it chose.
+
+**Confident error** — the LLM presents one answer with full confidence and no acknowledgement that conflicting information exists.
+
+**How to test:** create two document chunks with a deliberate contradiction on a specific fact. Index both. Run a query that retrieves both chunks and check the response. The ideal behaviour for most production systems is for the LLM to surface the conflict — "I found conflicting information in your documents: one source says X, another says Y." This turns a silent failure into an observable, testable outcome.
+
+A system prompt instruction helps: "If the retrieved context contains conflicting information, flag it and present both versions rather than choosing one." Test that instruction explicitly — it won't work unless you verify it.
+
+---
+
 ### "What is the difference between context precision and context recall in RAGAS?"
 
 Context precision measures how much of what was retrieved was actually relevant — a quality check on what went *in* to the LLM. Context recall measures whether retrieval surfaced *everything* needed to fully answer the question — a completeness check. High precision + low recall means retrieval is selective but missing things. Low precision + high recall means you're getting everything but also a lot of noise.
+
+---
+
+### "What do you do when RAGAS scores fall below the release threshold?"
+
+A failing score is the start of an investigation, not the end. The number tells you something is wrong; the individual query scores tell you where.
+
+**Step 1 — identify which metric failed.** Faithfulness and context precision/recall point to different problems. Faithfulness below threshold with good context precision means the LLM is hallucinating from good chunks — that is a generation problem. Context precision below threshold means retrieval is returning noisy, irrelevant chunks — that is a retrieval problem.
+
+**Step 2 — find the failing queries.** RAGAS scores per query, not just in aggregate. Look at the individual scores and find the bottom 10–20%. Read the retrieved chunks and the generated answer side by side for each failing case.
+
+**Step 3 — classify the failures.** Are the low-scoring queries all of a specific type — out-of-scope questions, multi-hop queries, a particular topic? A cluster means a systematic issue: a missing document, a poorly chunked section, a system prompt gap. Random low scores scattered across diverse queries are harder to fix and may point to a model quality ceiling.
+
+**Step 4 — fix the most common pattern and re-run.** Address the biggest cluster first — update the system prompt, adjust chunk size, add the missing document. Re-run RAGAS on the failing subset before re-running the full golden dataset: it is faster and cheaper, and confirms the fix worked before paying for a full evaluation pass.
+
+**Step 5 — escalate with data if the fix is not obvious.** A persistently low faithfulness score that does not respond to prompt tuning or chunking changes may mean the LLM model itself needs upgrading. That is a project decision, not a testing one — surface it with the specific failing queries and what was retrieved, not just "quality is low."
 
 ---
 
@@ -414,6 +501,18 @@ The trade-off: rerankers cannot pre-compute scores the way embedding models can,
 
 ---
 
+### "What is context compression and when is it used?"
+
+Context compression is a post-retrieval step in Advanced RAG. After the top-K chunks are retrieved, a compression model — or a fast LLM call — strips out sentences from those chunks that are not relevant to the specific query, before passing the remaining content to the main LLM.
+
+The problem it solves: a topically relevant chunk may contain 80% irrelevant sentences. A section about the 401k plan might also contain sentences about the EAP programme — both sit in the same handbook section, so they land in the same chunk. If the query is only about 401k, those EAP sentences consume context window space and can dilute or confuse the LLM's response.
+
+Context compression removes that noise: only the sentences directly relevant to the query are forwarded. This improves context precision and reduces context window pressure at high Top-K settings.
+
+**What a tester checks:** compression introduces a new failure mode — the compression step can strip relevant sentences along with the noise, leaving the LLM with an incomplete picture. Test this by checking whether answers to nuanced queries (where relevant content is interleaved with irrelevant content in the same chunk) are better or worse with compression enabled. Compare context precision and faithfulness scores with and without it. If precision improves but faithfulness drops, the compressor is being too aggressive.
+
+---
+
 ### "How would you choose an embedding model, and what happens if you swap it mid-project?"
 
 Choosing a model comes down to three factors. First, **domain fit** — a general-purpose model (like `text-embedding-3-small`) works well for most topics, but technical domains (medical, legal, code-heavy) benefit from models trained on similar text. Second, **dimensionality** — higher dimensions capture more nuance but cost more storage and compute. Third, **benchmarks** — the MTEB (Massive Text Embedding Benchmark) leaderboard ranks models across retrieval tasks and is the standard reference.
@@ -421,6 +520,22 @@ Choosing a model comes down to three factors. First, **domain fit** — a genera
 The critical rule: **the same model must be used for indexing and querying**. The embedding model converts text into a vector space — a coordinate system unique to that model. If you index documents with Model A and then query with Model B, the query vector lands in a different coordinate system and similarity scores become meaningless. Retrieval breaks completely, with no error — it just silently returns wrong results.
 
 This makes swapping an embedding model a **breaking change**. You must: wipe the entire vector store, re-index every document with the new model, and re-run the full golden dataset to establish a new baseline before declaring the swap successful. As a tester, I would treat an embedding model upgrade the same way I treat a database schema migration — full regression, not a smoke test.
+
+---
+
+### "What do you test when the LLM itself is swapped for a different model?"
+
+An LLM swap is different from an embedding model swap. The vector store and index stay intact — retrieval is completely unaffected. The change is entirely in the generation layer. But the generation layer is where faithfulness, instruction-following, tone, and out-of-scope behaviour live, so it needs its own test pass.
+
+**Faithfulness regression** — run RAGAS faithfulness on the full golden dataset with the new model. Different models have different propensities to hallucinate or add information beyond the retrieved context. A model that scores 0.92 faithfulness may be replaced with one that scores 0.78 even if its answers sound better.
+
+**Instruction-following** — run the full adversarial set: false-premise queries, role confusion, prompt injection, cross-domain bait. Different models respond differently to the same system prompt wording. A model that reliably refuses out-of-scope questions may be replaced with one that hedges instead of refusing cleanly.
+
+**Out-of-scope refusal rate** — some models are more eager to help than others. A model with strong RLHF training may try to answer even when the context contains nothing relevant. Run the full out-of-scope set and confirm refusal rate stays at 100%.
+
+**Temperature calibration** — the same temperature value produces different output variance across models. A setting of 0.3 on one model may behave like 0.7 on another. After a swap, re-run the golden dataset at your configured temperature and check BLEU variance before accepting the setting as equivalent.
+
+The key point: treat an LLM swap as a release — full re-run of all generation test categories, not just a smoke test. The retrieval layer passes automatically; every generation category needs to be re-verified from scratch.
 
 ---
 
@@ -540,6 +655,18 @@ The practical reason for this tiering is that RAGAS on a 50-entry golden dataset
 
 ---
 
+### "What is the difference between online and offline RAG evaluation?"
+
+**Offline evaluation** runs against a fixed dataset — your golden dataset — before the system reaches users. RAGAS, DeepEval, and your pytest suite are all offline tools. Offline evaluation is controlled, repeatable, and inexpensive to run. The limitation: it only covers queries you anticipated. If users ask things that are not in the golden dataset, offline evaluation tells you nothing about how those queries perform.
+
+**Online evaluation** monitors real traffic after deployment. A judge model scores live queries in the background — the same RAGAS metrics, but applied to actual user questions as they happen. This catches failure modes that golden datasets miss: unexpected query patterns, edge cases you didn't write, and quality drift over time as the knowledge base changes or the LLM is updated.
+
+The two are complementary, not alternatives. Offline evaluation gates releases — you don't deploy until offline scores pass. Online evaluation monitors health after deployment — you alert when live scores drop below a threshold.
+
+**What a tester needs to know:** most pre-release work is offline. Online evaluation requires production infrastructure: a running judge model, a logging pipeline, and an alerting threshold. TruLens and LangSmith both support online evaluation with minimal extra setup and are the right tools to reach for once the system is stable in production.
+
+---
+
 ### "How is RAG different from fine-tuning, and when would you use each?"
 
 Fine-tuning trains the model on new data — it bakes knowledge into the model's weights. RAG retrieves knowledge at query time from an external store — the model itself does not change.
@@ -587,6 +714,24 @@ The tools break into layers, and the choice depends on what you are testing rath
 **Production monitoring — TruLens or LangSmith.** Both trace individual queries through the pipeline so you can see what was retrieved, what the prompt looked like, and what the model returned — invaluable when a user reports a bad answer in production.
 
 **How to choose:** use the cheapest tool that catches the problem. Manual inspection for debugging, scripted tests for regression, RAGAS at release gates, Promptfoo for security. Don't run RAGAS on every commit — it makes LLM API calls per query. Save it for the gates that matter.
+
+---
+
+### "Where do you start when joining a new RAG project that has no existing test suite?"
+
+Start by understanding the system before writing a single test — tooling without context produces numbers that mean nothing.
+
+**Day 1 — understand the knowledge base.** What documents are indexed? How many chunks? What formats? Open Dify's Retrieval Testing panel and run 5–10 representative queries manually. Read the citation blocks. This tells you immediately whether retrieval is working at all and reveals the obvious failure patterns before you've written one line of test code.
+
+**Days 2–3 — identify the riskiest areas.** What are the most-asked questions? What topics would cause the most harm if answered incorrectly? What are the out-of-scope boundaries — what is the system explicitly not supposed to answer? These become the first golden dataset entries.
+
+**Days 4–5 — write a skeleton golden dataset.** Aim for 10–15 entries: five direct in-scope queries covering the highest-risk topics, three paraphrase variants, three out-of-scope queries, and two adversarial false-premise queries. This is enough to run a first RAGAS pass and see where the system actually stands.
+
+**Week 2 — establish a baseline.** Run the skeleton golden dataset through RAGAS and record faithfulness, answer relevancy, context precision, and context recall. These numbers are your baseline — every future change is measured against them, not against an abstract threshold pulled from a paper.
+
+**From there:** expand the golden dataset to cover more topics and edge cases, add a scripted ingestion smoke test, and agree with the team on the threshold that blocks a release.
+
+The anti-pattern to avoid: installing RAGAS on day one and running it against random queries. You'll get numbers with no context — you won't know if 0.72 faithfulness is a crisis or acceptable because you don't yet know what the system is supposed to do.
 
 ---
 
