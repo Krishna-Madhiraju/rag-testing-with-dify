@@ -1,180 +1,158 @@
 # Test Strategy — RAG Application (Dify + Weaviate)
 
-**Project:** RAG pipeline built on Dify, Weaviate vector store, local Docker deployment  
-**Stack:** Dify · Weaviate · OpenAI / Anthropic LLM · Python pytest  
-**Version:** 1.0 | June 2026
+**Project:** RAG assistant built on Dify with a Weaviate vector store, deployed via Docker
+**Version:** 1.0 · June 2026
+**Audience:** Engineering and QA leadership — for sign-off on scope, risk, and release gates
 
 ---
 
-Testing a Retrieval-Augmented Generation (RAG) application requires a specialized framework because traditional software testing cannot evaluate the unpredictable, non-deterministic nature of Large Language Models (LLMs). A robust RAG test strategy must independently validate two core phases: the **Retrieval component** (finding the right context from Weaviate) and the **Generation component** (producing an accurate response using that context). [1, 2, 3]
+## Why this needs its own strategy
+
+A RAG system answers questions from our own documents. Unlike traditional software, it is **non-deterministic** — the same question can yield different wording each time — and it can state a wrong answer with complete confidence. We cannot test it with simple pass/fail assertions. [1, 2, 3]
+
+So the strategy splits testing into the two things that can independently go wrong, and scores each on a 0–1 scale rather than true/false:
+
+| Phase | The question it answers | What goes wrong if we skip it |
+|---|---|---|
+| **Retrieval** (Weaviate) | Did we find the right source material for the question? | The system answers from the wrong documents, or finds nothing |
+| **Generation** (LLM) | Did the model answer using only what it found? | The model invents facts — a confident, wrong answer reaches the user |
 
 ---
 
-## 1. Test Levels & The RAG Triad Framework
+## What we measure — the RAG Triad
 
-A standard RAG strategy evaluates performance using three primary axes — the **RAG Triad** — each targeting a different part of the pipeline: [4, 5]
+Three checks, each targeting a different failure point. This is the industry-standard framework for RAG quality. [4, 5]
 
-- **Context Relevance:** Evaluates the *Retrieval* step. Out of all the chunks indexed in Weaviate, did the system pull content that actually relates to the user's query? Measured by RAGAS `context_precision` and `context_recall`. [6]
-- **Groundedness (Faithfulness):** Evaluates the *Generation* step. Does the LLM's response stay strictly within the retrieved context, or does it hallucinate facts not present in any chunk? [7, 8]
-- **Answer Relevance:** Evaluates the *end-to-end* experience. Does the final output directly address what the user actually asked? Measured by RAGAS `answer_relevancy`. [9]
-
-Each of the three axes maps to specific test types and metrics covered in the sections below.
-
----
-
-## 2. Specialized RAG Test Architecture
-
-Unlike standard applications, a RAG test strategy relies heavily on specialized data pipelines and evaluation frameworks rather than traditional assertion-based testing. [10, 11]
+| Check | Plain-English question | Why it matters to the business |
+|---|---|---|
+| **Context Relevance** | Did retrieval pull the right chunks? | Wrong source = wrong answer, no matter how good the model is [6] |
+| **Groundedness / Faithfulness** | Is the answer backed by those chunks? | This is our hallucination guard — the top reputational and compliance risk [7, 8] |
+| **Answer Relevance** | Did it actually answer what was asked? | A true-but-unrelated answer still fails the user [9] |
 
 ```
-[ User Query ]
-      │
-      ▼
-┌─────────────────┐
-│  1. Retrieval   │ ──► Context Relevance
-│  (Weaviate)     │     Did we retrieve the right chunks?
-└─────────────────┘     (context_precision, context_recall, recall@K)
-      │
-      │ (Retrieved Chunks)
-      ▼
-┌─────────────────┐
-│  2. Generation  │ ──► Groundedness / Faithfulness
-│  (LLM via Dify) │     Is the answer backed by the retrieved context?
-└─────────────────┘     (RAGAS faithfulness, LLM-as-judge)
-      │
-      │ (Final Response)
-      ▼
-┌─────────────────┐
-│  3. Response    │ ──► Answer Relevance
-│  (End-to-end)   │     Did it answer the original question?
-└─────────────────┘     (RAGAS answer_relevancy, BLEU, ROUGE-L)
+[ User Question ]
+        │
+        ▼
+  1. Retrieval  ──►  Context Relevance   ("Did we find the right material?")
+   (Weaviate)
+        │
+        ▼
+  2. Generation ──►  Groundedness        ("Is the answer backed by it?")
+   (LLM via Dify)
+        │
+        ▼
+  3. Response   ──►  Answer Relevance    ("Did it answer the question?")
 ```
 
-### Test Data & Golden Datasets
-
-- **Golden Dataset:** Build a human-curated evaluation set of 30–50+ representative `(query, expected answer, source chunk)` triplets covering all major topics, query types (single-hop, multi-hop, out-of-scope, paraphrase), and document formats in the corpus. See [rag-testing-toolkit.md](rag-testing-toolkit.md) for the full build and maintenance guide.
-- **Synthetic augmentation:** Use RAGAS's built-in test set generation to automatically produce diverse query variations from raw source documents — particularly useful for multi-hop and paraphrase coverage. [12]
-- **Volatile vs stable split:** For live-data systems, partition the dataset into stable facts (safe for regression) and volatile facts (freshness checks only, not regression targets).
-
-### Evaluation Methodology: LLM-as-a-Judge
-
-Manual regression testing is impossible at scale and cannot objectively measure hallucination or semantic faithfulness. This project deploys a **fixed judge model** (GPT-4o or GPT-4o-mini) as an automated evaluator to score the production RAG pipeline on a 0–1 scale across all three Triad metrics. [13, 14]
-
-The judge model must remain fixed across all runs — swapping it mid-project invalidates score comparisons. Scores are produced by RAGAS and DeepEval; raw answer text regression uses BLEU and ROUGE-L for deterministic, zero-cost checks on every commit. See [rag-testing-toolkit.md](rag-testing-toolkit.md) for setup and the metric-by-metric breakdown.
-
 ---
 
-## 3. Non-Functional RAG Testing
+## Risk areas & priority
 
-The strategy explicitly covers non-functional risks unique to RAG systems: [15]
-
-- **Latency & Throughput:** Weaviate vector search adds latency at scale. LLM Time-to-First-Token (TTFT) can degrade user experience significantly under load. Benchmark p50/p95/p99 query latency as the corpus grows and set a ceiling (target: end-to-end response ≤ 3 seconds at expected peak load).
-- **Token Budgeting & Cost:** Monitor token consumption per query — system prompt + retrieved chunks + question + response. A Top-K setting that's too high combined with large chunks can cause context window overflow (silent truncation) and runaway API costs.
-- **Security & Guardrails:** Stress-test against prompt injection via document content, data leakage (retrieving chunks the user shouldn't see), and toxic or off-policy outputs. Promptfoo's red-team mode auto-generates adversarial inputs. [16, 17]
-
----
-
-## 4. Risk Areas & Priority
+Where we focus effort. Priority = likelihood × business impact.
 
 | Risk | Likelihood | Impact | Priority |
 |---|---|---|---|
-| Stale chunks after document update | High | High | **P1** |
-| Silent ingestion failure (scanned PDFs, bad parsers) | High | High | **P1** |
-| Hallucination — LLM invents facts not in context | Medium | High | **P1** |
-| Out-of-scope queries answered instead of refused | Medium | High | **P1** |
-| Context window overflow at high Top-K | Medium | Medium | **P2** |
-| Contradictory documents producing blended answers | Medium | Medium | **P2** |
-| Embedding model mismatch after upgrade | Low | High | **P2** |
-| Prompt injection through document content | Low | High | **P2** |
-| Multi-hop retrieval gaps | Medium | Medium | **P3** |
-| Configuration drift (chunk size, overlap, threshold) | Low | Medium | **P3** |
+| Stale answers after a document is updated | High | High | **P1** |
+| Document silently fails to load (e.g. scanned PDF) | High | High | **P1** |
+| Hallucination — model invents facts not in the source | Medium | High | **P1** |
+| Out-of-scope questions answered instead of refused | Medium | High | **P1** |
+| Retrieved content overflows the model's limit (gets cut) | Medium | Medium | **P2** |
+| Conflicting documents produce a blended, wrong answer | Medium | Medium | **P2** |
+| Model or embedding upgrade changes behaviour | Low | High | **P2** |
+| Prompt injection hidden inside a document | Low | High | **P2** |
+| Multi-step questions miss part of the answer | Medium | Medium | **P3** |
+| Config drift (chunk size, overlap, threshold) | Low | Medium | **P3** |
 
 ---
 
-## 5. Tooling Stack Matrix
+## How we test it
 
-| Test Type | Purpose | Tools [18, 19, 20] |
+We use the cheapest method that catches each problem. Most checks need no specialist tooling; only deep quality scoring needs an evaluation framework.
+
+| Level | What it covers | Who owns it | Tooling |
+|---|---|---|---|
+| **Manual inspection** | Spot-checking retrieved chunks, format parsing, adversarial probing | Functional tester | [Dify Retrieval panel](https://docs.dify.ai/en/use-dify/knowledge/test-retrieval) |
+| **Scripted regression** | Ingestion audits, coverage sets, freshness and consistency checks | Tester with light Python | Dify API + Weaviate client + pytest |
+| **Cheap text regression** | Deterministic drift detection on every commit (free, instant) | Automated | BLEU, ROUGE-L |
+| **Quality scoring** | Faithfulness, relevance, retrieval precision/recall | Automated, gated runs | [RAGAS](https://docs.ragas.io), [DeepEval](https://deepeval.com) |
+| **Adversarial & injection** | Red-team, auto-generated attack inputs | Tester + tool | [Promptfoo](https://www.promptfoo.dev) |
+| **Performance** | Latency and concurrent-load benchmarks | Automated | [Locust](https://locust.io), [k6](https://k6.io) |
+
+**Evaluation method — LLM-as-a-judge:** quality scoring is done by a fixed "judge" model that rates each answer 0–1 on the three Triad checks. The judge stays pinned across runs — swapping it would invalidate score comparisons. Full setup is in the [testing toolkit](rag-testing-toolkit.md). [13, 14]
+
+**Test data — the golden dataset:** a human-curated set of 30–50+ `(question, expected answer, source)` examples covering every topic, question type, and document format. It is the backbone of every automated check; without it there is nothing to score against. [12]
+
+---
+
+## Non-functional checks
+
+| Area | What we watch | Why |
 |---|---|---|
-| **Manual retrieval inspection** | Chunk-level spot checks, format parsing, adversarial probing | [Dify Retrieval Testing panel](https://docs.dify.ai/en/use-dify/knowledge/test-retrieval) |
-| **Scripted regression** | Ingestion audits, coverage sets, freshness probes, consistency checks | Python + pytest + Dify API + Weaviate client |
-| **RAG Triad evaluation** | Faithfulness, answer relevancy, context precision/recall | [RAGAS](https://docs.ragas.io) (primary) |
-| **CI/CD quality gating** | Block deploys on quality regression; pytest-native | [DeepEval](https://deepeval.com) |
-| **Answer-text regression** | Cheap deterministic drift detection on every commit | BLEU (`sacrebleu`), ROUGE-L (`rouge-score`) |
-| **Adversarial & injection** | Red-team; auto-generated adversarial inputs | [Promptfoo](https://www.promptfoo.dev) |
-| **LLM Ops tracing** | Debugging retrieval and prompt failures in production | LangSmith, Phoenix (Arize) |
-| **Load testing** | Concurrent LLM generation speeds, latency at scale | [Locust](https://locust.io), [k6](https://k6.io) |
+| **Speed** | End-to-end response time at peak load (p50/p95/p99) | Slow answers lose users; latency grows as the document set grows [15] |
+| **Cost** | Tokens per query (prompt + retrieved chunks + answer) | Retrieving too much inflates cost and can silently truncate context |
+| **Security** | Prompt injection, data leakage, off-policy output | Documents can carry hidden instructions; users must not see restricted content [16, 17] |
 
 ---
 
-## 6. Test Cadence
+## Test cadence
 
-| Test | Cadence | Owner |
-|---|---|---|
-| Ingestion smoke test (chunk count > 0) | Every deploy | Scripted |
-| Out-of-scope refusal set | Every deploy | Manual + scripted |
-| BLEU / ROUGE-L regression on golden dataset | Every commit | Scripted |
-| Golden dataset recall@K | Every deploy | Scripted |
-| RAGAS faithfulness + answer relevancy | Pre-release gate | Eval tooling |
-| Format-specific retrieval (per format) | On new format added | Manual |
-| Adversarial + injection suite | Weekly / pre-release | Manual + Promptfoo |
-| Configuration comparison (chunk size, overlap) | On config change | Scripted + RAGAS |
-| Freshness probe (live data) | Daily | Scripted |
-| Latency & cost benchmarks | Weekly | Scripted |
+| Check | When |
+|---|---|
+| Ingestion smoke test (documents loaded) | Every deploy |
+| Out-of-scope refusal set | Every deploy |
+| BLEU / ROUGE-L text regression | Every commit |
+| Retrieval recall on golden dataset | Every deploy |
+| RAGAS faithfulness + answer relevance | Pre-release gate |
+| Adversarial + injection suite | Weekly / pre-release |
+| Freshness probe (live data) | Daily |
+| Latency & cost benchmarks | Weekly |
 
 ---
 
-## 7. Entry & Exit Criteria
+## Release gates (go / no-go)
 
-### Entry Criteria
+A release proceeds only when **all** of the following hold:
 
-- Weaviate is fully indexed with the baseline document corpus.
-- LLM API access is stable and a judge model is pinned for evaluation runs.
-- The Golden Dataset has been peer-reviewed for factual accuracy and source-chunk correctness.
-- The Dify application is published with a confirmed system prompt and API key available for automated testing.
+| Gate | Threshold |
+|---|---|
+| Groundedness / Faithfulness | ≥ 0.85 |
+| Context Relevance | ≥ 0.80 |
+| Answer Relevance | ≥ 0.80 |
+| Out-of-scope refusal rate | 100% |
+| Prompt injection blocked | 100% |
+| End-to-end latency at peak | ≤ 3 seconds |
+| Open P1 defects | 0 |
 
-### Exit Criteria
-
-- Average **Groundedness (Faithfulness)** score ≥ 0.85 across the golden dataset.
-- Average **Context Relevance** (context_precision) score ≥ 0.80.
-- Average **Answer Relevance** score ≥ 0.80.
-- Out-of-scope refusal rate = **100%** on the dedicated out-of-scope query set.
-- System blocks **100%** of standard prompt injection test cases.
-- End-to-end response latency ≤ **3 seconds** at expected peak load.
-- No P1 defects open.
+**Entry criteria** (before testing starts): Weaviate fully indexed, LLM and judge model pinned, golden dataset peer-reviewed for accuracy, Dify app published with an API key for automation.
 
 ---
 
-## Key Test Assets
+## Supporting assets
 
 | Asset | Location |
 |---|---|
-| Golden dataset (query + expected answer + source chunk) | `tests/` |
-| RAG tester FAQ and considerations guide | [docs/rag-tester-faq.md](rag-tester-faq.md) |
+| Golden dataset (question + expected answer + source) | `tests/` |
 | Testing toolkit — tools, RAGAS setup, metric guide | [docs/rag-testing-toolkit.md](rag-testing-toolkit.md) |
-| 54 functional test cases | [docs/functional-test-scenarios.md](functional-test-scenarios.md) |
+| 67 functional test cases | [docs/functional-test-scenarios.md](functional-test-scenarios.md) |
+| RAG tester FAQ & considerations | [docs/rag-tester-faq.md](rag-tester-faq.md) |
 | RAG terminology reference | [docs/glossary.md](glossary.md) |
 
 ---
 
 ## References
 
-[1] [RAGAS — Evaluating RAG Pipelines](https://docs.ragas.io/en/stable/)  
-[2] [Dify — Test Knowledge Retrieval](https://docs.dify.ai/en/use-dify/knowledge/test-retrieval)  
-[3] [RAG Evaluation Methods and Metrics 2026](https://datavlab.ai/post/rag-evaluation-methods-metrics-2026-guide)  
-[4] [What is the RAG Triad? — TruEra](https://truera.com/ai-quality-education/generative-ai-rags/what-is-the-rag-triad/)  
-[5] [RAG Evaluation — Comet ML](https://www.comet.com/site/blog/rag-evaluation/)  
-[6] [RAGAS Available Metrics](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/)  
-[7] [Detecting Hallucination in RAG — Towards Data Science](https://towardsdatascience.com/detecting-hallucination-in-rag-ecaf251a6633/)  
-[8] [Measuring RAG Groundedness — Openlayer](https://www.openlayer.com/blog/post/measuring-rag-groundedness-complete-evaluation-guide)  
-[9] [RAG Evaluation Metrics — qaskills.sh](https://qaskills.sh/blog/rag-evaluation-metrics-complete-2026)  
-[10] [Testing RAG Systems — Testfort](https://testfort.com/blog/testing-rag-systems)  
-[11] [RAG Evaluation 2026 — Benchmarking Agents](https://benchmarkingagents.com/rag-eval/)  
-[12] [RAGAS Quickstart — Test Set Generation](https://docs.ragas.io/en/stable/getstarted/)  
-[13] [LLM-as-a-Judge — Automated Scoring](https://dev.to/lamhot/llm-as-a-judge-automated-scoring-and-reliability-vs-human-evaluation-128n)  
-[14] [Evaluate RAG with LLM-as-Judge — W&B](https://wandb.ai/ai-team-articles/evals/reports/Evaluate-your-RAG-pipeline-using-LLM-as-a-Judge-with-custom-dataset-creation-Part-2---VmlldzoxNTIwNjI2MQ)  
-[15] [RAG in Production — Kairntech](https://kairntech.com/blog/articles/rag-production-the-complete-guide-to-building-and-deploying-retrieval-augmented-generation-applications/)  
-[16] [NeMo Guardrails — NVIDIA](https://github.com/NVIDIA/NeMo-Guardrails)  
-[17] [Promptfoo — LLM Red Teaming](https://www.promptfoo.dev)  
-[18] [DeepEval vs RAGAS 2026](https://qaskills.sh/blog/deepeval-vs-ragas-rag-evaluation-2026)  
-[19] [Promptfoo vs DeepEval vs RAGAS](https://genai.qa/blog/promptfoo-vs-deepeval-vs-ragas/)  
-[20] [Top RAG Evaluation Tools 2026 — Maxim AI](https://www.getmaxim.ai/articles/top-5-tools-to-evaluate-rag-performance-in-2026/)
+[1] [RAGAS — Evaluating RAG Pipelines](https://docs.ragas.io/en/stable/)
+[2] [Dify — Test Knowledge Retrieval](https://docs.dify.ai/en/use-dify/knowledge/test-retrieval)
+[3] [RAG Evaluation Methods and Metrics 2026](https://datavlab.ai/post/rag-evaluation-methods-metrics-2026-guide)
+[4] [What is the RAG Triad? — TruEra](https://truera.com/ai-quality-education/generative-ai-rags/what-is-the-rag-triad/)
+[5] [RAG Evaluation — Comet ML](https://www.comet.com/site/blog/rag-evaluation/)
+[6] [RAGAS Available Metrics](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/)
+[7] [Detecting Hallucination in RAG — Towards Data Science](https://towardsdatascience.com/detecting-hallucination-in-rag-ecaf251a6633/)
+[8] [Measuring RAG Groundedness — Openlayer](https://www.openlayer.com/blog/post/measuring-rag-groundedness-complete-evaluation-guide)
+[9] [RAG Evaluation Metrics — qaskills.sh](https://qaskills.sh/blog/rag-evaluation-metrics-complete-2026)
+[12] [RAGAS Quickstart — Test Set Generation](https://docs.ragas.io/en/stable/getstarted/)
+[13] [LLM-as-a-Judge — Automated Scoring](https://dev.to/lamhot/llm-as-a-judge-automated-scoring-and-reliability-vs-human-evaluation-128n)
+[14] [Evaluate RAG with LLM-as-Judge — W&B](https://wandb.ai/ai-team-articles/evals/reports/Evaluate-your-RAG-pipeline-using-LLM-as-a-Judge-with-custom-dataset-creation-Part-2---VmlldzoxNTIwNjI2MQ)
+[15] [RAG in Production — Kairntech](https://kairntech.com/blog/articles/rag-production-the-complete-guide-to-building-and-deploying-retrieval-augmented-generation-applications/)
+[16] [NeMo Guardrails — NVIDIA](https://github.com/NVIDIA/NeMo-Guardrails)
+[17] [Promptfoo — LLM Red Teaming](https://www.promptfoo.dev)
