@@ -76,8 +76,9 @@ rag-demo/
 ├── docs/
 │   ├── dify-setup.md               # Step-by-step Dify configuration guide
 │   ├── glossary.md                 # RAG terminology reference
+│   ├── test-strategy.md            # One-page test strategy for the RAG pipeline
 │   ├── functional-test-scenarios.md # 54 functional test cases
-│   ├── rag-testing-scenarios.md    # Practical Q&A on real-world testing challenges
+│   ├── rag-tester-faq.md           # Tester FAQ — considerations and interview guide
 │   ├── rag-testing-toolkit.md      # Testing levels and tools (manual/scripted/RAGAS)
 │   └── sample-data/
 │       └── orion-technologies-employee-handbook.pdf  # Test document
@@ -428,10 +429,11 @@ docker compose up -d       # start again from scratch
 
 ## Resources
 
+- [Test Strategy](docs/test-strategy.md) — one-page strategy covering scope, risk areas, test types, cadence, and tools
 - [RAG Terminology Glossary](docs/glossary.md) — every term you will encounter, explained in plain language
 - [Dify Setup Guide](docs/dify-setup.md) — step-by-step configuration for Knowledge Base and Chatbot
 - [Functional Test Scenarios](docs/functional-test-scenarios.md) — 54 test cases covering in-scope, out-of-scope, paraphrase, adversarial, and ambiguous queries
-- [RAG Testing Scenarios](docs/rag-testing-scenarios.md) — practical Q&A on testing document updates, model swaps, large corpora, daily-changing data, mixed file formats, temperature changes, chunk size, and overlap optimisation
+- [RAG Tester FAQ](docs/rag-tester-faq.md) — considerations and interview guide covering document updates, model swaps, scale, live data, mixed formats, temperature, chunk size, overlap, contradictions, multi-hop, prompt injection, and more
 - [RAG Testing Toolkit](docs/rag-testing-toolkit.md) — the three testing levels (manual / scripted / eval tooling), the tools behind each, RAGAS setup, and which tool to use when
 - [Dify Documentation](https://docs.dify.ai)
 - [Dify GitHub Repository](https://github.com/langgenius/dify)

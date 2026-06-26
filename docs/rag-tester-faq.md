@@ -1,6 +1,6 @@
-# RAG Testing Scenarios — Practical Q&A
+# RAG Tester FAQ — Considerations & Interview Guide
 
-Real situations you'll hit when testing a RAG system, and how to actually test for each one. Every scenario covers four things: what's going on (in plain language), what can go wrong, what to test, and — importantly — *who can test it and with what tools*.
+Common questions a tester faces when working on a RAG application — covering what factors to consider, what can go wrong, and how to approach testing each situation. Useful both as a day-to-day reference and as interview preparation. Every question covers: the situation in plain language, what the risk is, what to look at, and who can test it and with what tools.
 
 ---
 
