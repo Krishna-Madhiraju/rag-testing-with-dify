@@ -2,6 +2,8 @@
 
 A reference guide to every term you will encounter when building, running, and testing RAG applications. Terms are grouped by topic, not alphabetical order, so related concepts sit together.
 
+> **Interview prep?** Start with [rag-interview-prep.md](rag-interview-prep.md) — it covers the 20 core terms with a tester angle and 12 interview Q&As. Come back here when you hit a term that needs more depth.
+
 ---
 
 ## Core RAG Concepts
