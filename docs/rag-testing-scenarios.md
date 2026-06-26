@@ -8,13 +8,13 @@ Real situations you'll hit when testing a RAG system, and how to actually test f
 
 A question I kept asking while writing this: *can a functional tester check this by hand, or do you need an evaluation framework?* The honest answer is "it depends on the scenario," so each one is tagged with the realistic approach:
 
-- **Manual** — a tester can do this by hand, no coding. The main tool is Dify's **Retrieval Testing** panel (open a Knowledge Base → click the Retrieval Testing icon → type a query → read the chunks that come back, each with a match score). Plus the chat preview for end-to-end answers. This is where a functional tester does most of their exploring.
-- **Scripted** — needs light automation: a small Python script hitting the Dify API or querying Weaviate directly. Think counting chunks, running a list of 50 questions in a loop, or reading a chunk's metadata. A technical tester can own this. No evaluation framework needed.
-- **Eval tooling** — needs a framework like [RAGAS](https://docs.ragas.io) or an LLM-as-judge setup, because what you're measuring (is the answer faithful? is it relevant?) can't be eyeballed reliably once you have more than a handful of answers. This is where you stop trusting your gut and let a scoring model do the counting.
+- **Manual** — a tester can do this by hand, no coding. The main tool is Dify's **Retrieval Testing** panel and the chat preview. This is where a functional tester does most of their exploring.
+- **Scripted** — light automation: a small Python script hitting the Dify API or querying Weaviate directly. Counting chunks, looping a list of questions, reading metadata. A technical tester can own this. No eval framework needed.
+- **Eval tooling** — a framework like RAGAS or an LLM-as-judge setup, because what you're measuring (is the answer faithful? is it relevant?) can't be eyeballed reliably across more than a handful of answers.
 
-Most real testing is a mix. You poke at a few cases manually to understand the failure, then script it or bring in RAGAS to measure it at scale. The tags below tell you where each scenario *starts* and where it needs to *grow up*.
+Most real testing is a mix: poke at a few cases manually to understand the failure, then script it or bring in RAGAS to measure it at scale. The tags tell you where each scenario *starts* and where it needs to *grow up*.
 
-> Quick RAGAS primer (used throughout): **Faithfulness** = is the answer backed by the retrieved chunks, or did the model make it up? **Answer relevancy** = does the answer actually address the question? **Context precision** = of the chunks we retrieved, how many were useful? **Context recall** = of the chunks we needed, how many did we actually retrieve? Faithfulness needs no "correct answer" to compare against, which is why it's the one you can run in production. The others need a reference answer or labelled chunks.
+> **Full details — what each tool is, how to set it up, and which tool to use when — live in [RAG Testing Toolkit](rag-testing-toolkit.md).** That doc also has the RAGAS metric primer (faithfulness, answer relevancy, context precision, context recall) referenced throughout the scenarios below.
 
 ---
 
