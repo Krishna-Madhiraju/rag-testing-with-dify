@@ -4,7 +4,11 @@ These scenarios test the full RAG pipeline (retrieval + generation) against the 
 All expected results are derived directly from the handbook content.
 
 > **How to run:** Open the Orion HR Assistant chatbot → type the query → compare the response against the pass criteria.
-> Use the citation block below each response to identify whether a failure is a **retrieval failure** (wrong chunk) or **generation failure** (right chunk, wrong answer).
+>
+> **Enable citations first (one-time setup):**
+> In Dify Studio → open your app → click **Features** (top toolbar) → toggle on **Citation and Attribution** → Publish.
+> Once enabled, a expandable **Sources** section appears below every response showing exactly which document chunk was retrieved and its similarity score.
+> Use this to distinguish a **retrieval failure** (wrong chunk returned) from a **generation failure** (right chunk returned, wrong answer produced).
 
 ---
 
