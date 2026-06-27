@@ -63,7 +63,8 @@ rag-demo/
 │   │   ├── glossary.md                 # RAG terminology reference
 │   │   ├── rag-interview-prep.md       # Key terms + 12 interview Q&As for RAG testing roles
 │   │   ├── rag-tester-faq.md           # Tester FAQ — considerations and interview guide
-│   │   └── rag-testing-toolkit.md      # Testing levels and tools (manual/scripted/RAGAS)
+│   │   ├── rag-testing-toolkit.md      # Testing levels and tools (manual/scripted/RAGAS)
+│   │   └── rag-testing-quiz.md         # 10-question knowledge check with full answers
 │   ├── testing/
 │   │   ├── test-strategy.md            # One-page test strategy for the RAG pipeline
 │   │   └── functional-test-scenarios.md # 67 functional test cases
@@ -206,6 +207,7 @@ docker system prune            # remove unused images and containers
 - [Test Strategy](docs/testing/test-strategy.md) — scope, risk areas, test types, cadence, and release gates
 - [Functional Test Scenarios](docs/testing/functional-test-scenarios.md) — 67 test cases
 - [RAG Testing Toolkit](docs/reference/rag-testing-toolkit.md) — manual / scripted / eval tooling levels and RAGAS setup
+- [RAG Testing Knowledge Check](docs/reference/rag-testing-quiz.md) — 10 questions covering the pipeline, retrieval, evaluation, and release gates
 - [RAG Tester FAQ](docs/reference/rag-tester-faq.md) — scenario-based considerations and interview prep
 - [RAG Interview Prep](docs/reference/rag-interview-prep.md) — key terms + 12 interview Q&As
 - [RAG Terminology Glossary](docs/reference/glossary.md) — every RAG term, explained in plain language
