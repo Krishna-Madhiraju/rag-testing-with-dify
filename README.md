@@ -71,6 +71,7 @@ rag-demo/
 │   │       ├── rag-testing-quiz-2.md  # Quiz 2 — evaluation metrics, BLEU/ROUGE/RAGAS (10 Q&As)
 │   │       └── rag-testing-quiz-3.md  # Quiz 3 — retrieval internals, Advanced RAG, adversarial (10 Q&As)
 │   ├── testing/
+│   │   ├── first-evaluation.md         # Step-by-step guide to running your first RAG evaluation
 │   │   ├── test-strategy.md            # One-page test strategy for the RAG pipeline
 │   │   ├── rag-evaluation-playbook.md  # How to execute RAG evaluation — metrics, techniques, A/B testing
 │   │   └── functional-test-scenarios.md # 67 functional test cases
@@ -126,7 +127,7 @@ Summary of the one-time setup:
 
 ## Testing the Pipeline
 
-This is the core focus of the project. The system under test is an **HR Assistant chatbot** built on top of the Orion Technologies Employee Handbook — a realistic test document with policy information, dates, named roles, and edge-case content.
+This is the core focus of the project. The system under test is the **Orion HR Assistant** — a RAG chatbot built on the Orion Technologies Employee Handbook, a realistic test document with policy information, dates, named roles, and edge-case content.
 
 ### Test layers
 
@@ -210,6 +211,7 @@ docker system prune            # remove unused images and containers
 ## Resources
 
 ### This project
+- [First RAG Evaluation](docs/testing/first-evaluation.md) — step-by-step guide: build a golden dataset, query the Orion HR Assistant (via API or UI), score retrieval and generation, document your baseline
 - [Test Strategy](docs/testing/test-strategy.md) — scope, risk areas, test types, cadence, and release gates
 - [RAG Evaluation Playbook](docs/testing/rag-evaluation-playbook.md) — how to execute evaluation: retrieval metrics, generation scoring, prompt sensitivity, A/B testing
 - [Functional Test Scenarios](docs/testing/functional-test-scenarios.md) — 67 test cases

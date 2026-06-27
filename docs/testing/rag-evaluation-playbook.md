@@ -57,13 +57,13 @@ Test retrieval in isolation by sending the question to the vector store and chec
 ### How to run it
 
 For each row in your golden dataset:
-1. Submit the `question` to the retrieval API (Dify or Weaviate directly)
-2. Collect the top-K returned chunks
+1. Submit the `question` to the Orion HR Assistant (via API or the chat UI)
+2. Collect the top-K returned chunks from the response
 3. Check whether `expected_chunk` appears in the results
 4. Record rank position if found; record miss if not found
 5. Calculate Precision@K, Recall@K, MRR across all rows
 
-Check the Dify retrieval inspector or query Weaviate directly to see raw retrieval results without the LLM step.
+If using Dify: the retrieval inspector shows exactly which chunks were returned for any query without the LLM step. You can also query Weaviate directly for raw retrieval results. See [first-evaluation.md](first-evaluation.md) for guidance on API vs UI access.
 
 ---
 
