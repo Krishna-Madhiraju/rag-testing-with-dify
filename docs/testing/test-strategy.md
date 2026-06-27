@@ -78,7 +78,7 @@ We use the cheapest method that catches each problem. Most checks need no specia
 | **Adversarial & injection** | Red-team, auto-generated attack inputs | Tester + tool | [Promptfoo](https://www.promptfoo.dev) |
 | **Performance** | Latency and concurrent-load benchmarks | Automated | [Locust](https://locust.io), [k6](https://k6.io) |
 
-**Evaluation method — LLM-as-a-judge:** quality scoring is done by a fixed "judge" model that rates each answer 0–1 on the three Triad checks. The judge stays pinned across runs — swapping it would invalidate score comparisons. Full setup is in the [testing toolkit](rag-testing-toolkit.md). [13, 14]
+**Evaluation method — LLM-as-a-judge:** quality scoring is done by a fixed "judge" model that rates each answer 0–1 on the three Triad checks. The judge stays pinned across runs — swapping it would invalidate score comparisons. Full setup is in the [testing toolkit](../reference/rag-testing-toolkit.md). [13, 14]
 
 **Test data — the golden dataset:** a human-curated set of 30–50+ `(question, expected answer, source)` examples covering every topic, question type, and document format. It is the backbone of every automated check; without it there is nothing to score against. [12]
 
@@ -132,10 +132,10 @@ A release proceeds only when **all** of the following hold:
 | Asset | Location |
 |---|---|
 | Golden dataset (question + expected answer + source) | `tests/` |
-| Testing toolkit — tools, RAGAS setup, metric guide | [docs/rag-testing-toolkit.md](rag-testing-toolkit.md) |
-| 67 functional test cases | [docs/functional-test-scenarios.md](functional-test-scenarios.md) |
-| RAG tester FAQ & considerations | [docs/rag-tester-faq.md](rag-tester-faq.md) |
-| RAG terminology reference | [docs/glossary.md](glossary.md) |
+| Testing toolkit — tools, RAGAS setup, metric guide | [docs/reference/rag-testing-toolkit.md](../reference/rag-testing-toolkit.md) |
+| 67 functional test cases | [docs/testing/functional-test-scenarios.md](functional-test-scenarios.md) |
+| RAG tester FAQ & considerations | [docs/reference/rag-tester-faq.md](../reference/rag-tester-faq.md) |
+| RAG terminology reference | [docs/reference/glossary.md](../reference/glossary.md) |
 
 ---
 

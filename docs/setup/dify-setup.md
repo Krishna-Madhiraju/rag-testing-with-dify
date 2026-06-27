@@ -1,7 +1,7 @@
 # Setting Up Dify for RAG — Knowledge Base & Chatbot
 
 This guide walks you through configuring Dify after the Docker containers are running.
-If you haven't started the containers yet, follow the [main setup guide](../README.md) first.
+If you haven't started the containers yet, follow the [main setup guide](../../README.md) first.
 
 ---
 
