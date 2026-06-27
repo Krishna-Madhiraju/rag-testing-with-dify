@@ -64,7 +64,9 @@ rag-demo/
 │   │   ├── rag-interview-prep.md       # Key terms + 12 interview Q&As for RAG testing roles
 │   │   ├── rag-tester-faq.md           # Tester FAQ — considerations and interview guide
 │   │   ├── rag-testing-toolkit.md      # Testing levels and tools (manual/scripted/RAGAS)
-│   │   └── rag-testing-quiz.md         # 10-question knowledge check with full answers
+│   │   ├── rag-testing-quiz.md         # Quiz 1 — pipeline, chunking, retrieval basics (10 Q&As)
+│   │   ├── rag-testing-quiz-2.md      # Quiz 2 — evaluation metrics, BLEU/ROUGE/RAGAS (10 Q&As)
+│   │   └── rag-testing-quiz-3.md      # Quiz 3 — retrieval internals, Advanced RAG, adversarial (10 Q&As)
 │   ├── testing/
 │   │   ├── test-strategy.md            # One-page test strategy for the RAG pipeline
 │   │   └── functional-test-scenarios.md # 67 functional test cases
@@ -207,7 +209,9 @@ docker system prune            # remove unused images and containers
 - [Test Strategy](docs/testing/test-strategy.md) — scope, risk areas, test types, cadence, and release gates
 - [Functional Test Scenarios](docs/testing/functional-test-scenarios.md) — 67 test cases
 - [RAG Testing Toolkit](docs/reference/rag-testing-toolkit.md) — manual / scripted / eval tooling levels and RAGAS setup
-- [RAG Testing Knowledge Check](docs/reference/rag-testing-quiz.md) — 10 questions covering the pipeline, retrieval, evaluation, and release gates
+- [RAG Testing Quiz 1](docs/reference/rag-testing-quiz.md) — pipeline flow, chunking, retrieval, temperature, golden datasets, release gates
+- [RAG Testing Quiz 2](docs/reference/rag-testing-quiz-2.md) — BLEU, ROUGE-L, GPTScore, RAGAS metrics, A/B testing, CI vs release gate design
+- [RAG Testing Quiz 3](docs/reference/rag-testing-quiz-3.md) — dense vs sparse retrieval, HNSW, hybrid search, HyDE, adversarial test design
 - [RAG Tester FAQ](docs/reference/rag-tester-faq.md) — scenario-based considerations and interview prep
 - [RAG Interview Prep](docs/reference/rag-interview-prep.md) — key terms + 12 interview Q&As
 - [RAG Terminology Glossary](docs/reference/glossary.md) — every RAG term, explained in plain language
