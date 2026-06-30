@@ -3,6 +3,8 @@
 These scenarios test the full RAG pipeline (retrieval + generation) against the **Orion Technologies Employee Handbook**.
 All expected results are derived directly from the handbook content and have been verified against the source PDF (Version 4.2, effective January 1, 2025).
 
+> **Why these cases are shaped the way they are:** the adversarial and out-of-scope categories (8, 9, 13, 14, 15) each target a specific failure mode. For the reasoning behind each design pattern and how to write new cases for a different system, see **[Adversarial Testing](adversarial-testing.md)**.
+
 > **Enable citations first (one-time setup):**
 > In Dify Studio → open your app → click **Features** (top toolbar) → toggle on **Citation and Attribution** → Publish.
 > Once enabled, an expandable **Sources** section appears below every response showing exactly which document chunk was retrieved and its similarity score.

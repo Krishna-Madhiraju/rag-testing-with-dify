@@ -5,7 +5,7 @@ RAGAS (Retrieval-Augmented Generation Assessment) is a Python library with two d
 1. **Synthetic dataset generation** — building a golden dataset from your documents automatically
 2. **Evaluation scoring** — measuring faithfulness, answer relevance, context precision, and context recall against an existing dataset
 
-This document covers the generation side. For evaluation metrics, see the [RAG Evaluation Playbook](../testing/rag-evaluation-playbook.md).
+This document covers the generation side. For how each evaluation metric works mechanically — Faithfulness, Answer Relevancy, Context Precision, Context Recall — see **[RAGAS Evaluation Metrics](ragas-evaluation-metrics.md)**.
 
 ---
 

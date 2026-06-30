@@ -63,13 +63,16 @@ rag-demo/
 │   ├── setup/
 │   │   └── dify-setup.md                # Step-by-step Dify configuration guide
 │   ├── testing/
-│   │   ├── first-evaluation.md          # Run your first end-to-end RAG evaluation
-│   │   ├── test-strategy.md             # One-page test strategy for the RAG pipeline
-│   │   ├── rag-evaluation-playbook.md   # How to execute evaluation — metrics, A/B testing
-│   │   ├── functional-test-scenarios.md # 74 functional test cases
-│   │   ├── golden-dataset-guide.md      # Build and use golden datasets for regression testing
-│   │   ├── ragas-intro.md               # How RAGAS TestsetGenerator works — components, flow
-│   │   └── rag-testing-toolkit.md       # Testing levels and tools (manual/scripted/RAGAS)
+│   │   ├── test-strategy.md                  # One-page test strategy for the RAG pipeline
+│   │   ├── rag-evaluation-playbook.md        # How to execute evaluation — metrics, A/B testing
+│   │   ├── functional-test-scenarios.md      # 74 functional test cases
+│   │   ├── chunking-strategies.md            # Chunk size, overlap, strategy — failure modes + how to measure
+│   │   ├── ragas-intro.md                    # How RAGAS TestsetGenerator works — components, flow
+│   │   ├── ragas-evaluation-metrics.md       # Faithfulness, Answer Relevancy, Context Precision, Context Recall
+│   │   ├── advanced-evaluation-metrics.md    # BERTScore, MRR, NDCG — completing the metrics stack
+│   │   ├── rag-vs-api-testing.md             # Why RAG testing is harder — non-determinism, silent retrieval failure, two surfaces
+│   │   ├── comparing-rag-configurations.md   # Controlled experiment design, scorecard, reading results by query type, declaring a winner
+│   │   └── rag-testing-toolkit.md            # Testing levels and tools (manual/scripted/RAGAS)
 │   ├── going-further/
 │   │   ├── resources.md                 # Curated external reading + references
 │   │   └── quizzes/
@@ -78,10 +81,15 @@ rag-demo/
 │   │       └── rag-testing-quiz-3.md     # Quiz 3 — retrieval internals, Advanced RAG
 │   └── sample-data/
 │       └── orion-technologies-employee-handbook.pdf  # Test document
-├── results/
-│   └── golden-dataset.csv       # 60-row golden dataset for the Orion HR Assistant
-├── scripts/
-│   └── run_evaluation.py        # Runs the golden dataset through the assistant via the Dify API
+├── golden-dataset/              # Everything for golden dataset evaluation — end to end
+│   ├── golden-dataset.csv               # The dataset (questions, reference answers, expected chunks)
+│   ├── golden-dataset-remaining.csv     # Additional rows not yet merged into main dataset
+│   ├── guide.md                         # Why golden datasets, how to build one, generation approaches
+│   ├── first-evaluation.md              # Step-by-step: run the dataset, score retrieval + generation
+│   ├── run_evaluation.py                # Script: sends every question to the Orion HR Assistant
+│   ├── score_results.py                 # Script: computes BLEU, ROUGE-L, and GPTScore on results
+│   └── runs/                            # Output from each evaluation run
+│       └── (run-001.csv, scores.md appear here after running)
 └── README.md
 ```
 
@@ -169,6 +177,7 @@ curl -X POST http://localhost/v1/chat-messages \
 | [functional-test-scenarios.md](docs/testing/functional-test-scenarios.md) | 74 test cases — in-scope, paraphrase, ambiguous, adversarial, multi-hop, out-of-scope, multi-turn, tone |
 | [rag-testing-toolkit.md](docs/testing/rag-testing-toolkit.md) | Manual / scripted / eval tooling levels, RAGAS setup, which tool to use when |
 | [rag-evaluation-playbook.md](docs/testing/rag-evaluation-playbook.md) | How to execute evaluation — retrieval metrics, generation scoring, A/B testing |
+| [golden-dataset/](golden-dataset/) | Golden dataset, evaluation scripts, and run results — all in one place |
 
 ---
 
@@ -224,14 +233,29 @@ A suggested reading order — concepts first, then set up, then test:
 **2 · Set up the pipeline**
 - [Dify Setup Guide](docs/setup/dify-setup.md) — step-by-step Dify configuration
 
-**3 · Test it**
-- [First RAG Evaluation](docs/testing/first-evaluation.md) — build a golden dataset, query the Orion HR Assistant, score retrieval and generation, record a baseline
+**3 · Test it — must-read**
+- [Why RAG Testing Is Harder Than Normal API Testing](docs/testing/rag-vs-api-testing.md) — read this first: three properties that break standard test assumptions; the three-layer testing strategy
 - [Test Strategy](docs/testing/test-strategy.md) — scope, risk areas, test types, cadence, and release gates
-- [RAG Evaluation Playbook](docs/testing/rag-evaluation-playbook.md) — how to execute evaluation: retrieval metrics, generation scoring, A/B testing
 - [Functional Test Scenarios](docs/testing/functional-test-scenarios.md) — 74 test cases across 12 categories (in-scope, paraphrase, adversarial, multi-hop, multi-turn, tone, and more)
-- [Golden Dataset Guide](docs/testing/golden-dataset-guide.md) — build golden datasets manually, synthetically, and at scale
+- [RAG Evaluation Playbook](docs/testing/rag-evaluation-playbook.md) — how to execute evaluation: retrieval metrics, generation scoring, A/B testing
+- [RAGAS Evaluation Metrics](docs/testing/ragas-evaluation-metrics.md) — Faithfulness, Answer Relevancy, Context Precision, Context Recall: how each works, what it catches, when to use it
+- [Adversarial Testing](docs/testing/adversarial-testing.md) — five failure modes (hallucination, false premise, prompt injection, document injection, conflicting docs); how to write cases and classify severity
+
+**3 · Test it — go deeper**
+- [Chunking Strategies](docs/testing/chunking-strategies.md) — how chunk size, overlap, and strategy affect retrieval; failure modes by query type; how to run a before/after comparison
+- [Comparing RAG Configurations](docs/testing/comparing-rag-configurations.md) — controlled experiment design, scorecard by config type, reading results by query type, declaring a winner
+- [Advanced Evaluation Metrics](docs/testing/advanced-evaluation-metrics.md) — BERTScore, MRR, and NDCG: the metrics that complete the picture beyond BLEU/ROUGE and Recall@K
 - [Introduction to RAGAS](docs/testing/ragas-intro.md) — how RAGAS TestsetGenerator works: components, flow, question types
 - [RAG Testing Toolkit](docs/testing/rag-testing-toolkit.md) — manual / scripted / eval tooling levels and RAGAS setup
+
+**Golden dataset evaluation** (end to end in one folder: `golden-dataset/`)
+- [Golden Dataset Guide](golden-dataset/guide.md) — why golden datasets, how to build one, generation approaches
+- [First RAG Evaluation](golden-dataset/first-evaluation.md) — run the dataset, score retrieval and generation, record a baseline
+- Scripts — run in this order:
+  1. `run_evaluation.py` — sends every question to the Orion HR Assistant, writes `runs/run-001.csv`
+  2. `score_results.py` — computes BLEU, ROUGE-L, and GPTScore on the results
+  3. `ragas_eval.py` — runs Faithfulness, Answer Relevancy, Context Precision, Context Recall via RAGAS
+- Results land in `golden-dataset/runs/`
 
 **4 · Going further (optional)**
 - [Further Resources](docs/going-further/resources.md) — curated external reading: surveys, frameworks, leaderboards, primary sources

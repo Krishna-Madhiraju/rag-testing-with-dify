@@ -101,7 +101,7 @@ Generate synthetically, then apply automated quality filters instead of human re
 
 RAGAS has a built-in `TestsetGenerator` that combines a generator LLM and a critic LLM: the generator produces questions, the critic scores their quality before you ever see them. It classifies each question as simple, multi-hop, or reasoning — giving you a diversified, quality-filtered dataset without writing filter code.
 
-For a full explanation of how RAGAS works internally, the three components, question types, what it cannot generate, and the Python concepts needed to follow the setup, see **[Introduction to RAGAS](ragas-intro.md)**.
+For a full explanation of how RAGAS works internally, the three components, question types, what it cannot generate, and the Python concepts needed to follow the setup, see **[Introduction to RAGAS](../docs/testing/ragas-intro.md)**.
 
 ---
 

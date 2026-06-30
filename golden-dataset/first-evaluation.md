@@ -37,7 +37,7 @@ Step 4 — Score generation                  ← was the answer correct?
 
 Before you run a single query, set up your result file. This is where you record everything.
 
-Create a spreadsheet or CSV file called `results/run-001.csv`. The `results/` folder already exists — it contains your golden dataset at `results/golden-dataset.csv`.
+Create a spreadsheet or CSV file called `runs/run-001.csv` inside the `golden-dataset/` folder. The golden dataset lives alongside it at `golden-dataset/golden-dataset.csv`.
 
 The result file has two parts: what you expected (from your golden dataset) and what you actually got (from the Orion HR Assistant). Here are all the columns:
 
@@ -65,7 +65,7 @@ The result file has two parts: what you expected (from your golden dataset) and 
 
 **Goal:** create a CSV file where you have manually verified the correct answer and the correct source chunk for each question.
 
-**The golden dataset for the Orion HR Assistant is already built** at `results/golden-dataset.csv` — 60 rows covering all query types. If you are setting up a golden dataset for a new system in future, follow the steps below to build one from scratch.
+**The golden dataset for the Orion HR Assistant is already built** at `golden-dataset/golden-dataset.csv` — 60 rows covering all query types. If you are setting up a golden dataset for a new system in future, follow the steps below to build one from scratch.
 
 ### Column structure
 
@@ -275,7 +275,7 @@ Example: chunks found at ranks 1, 1, 2, 1, not found → (1.0 + 1.0 + 0.5 + 1.0 
 
 ### Record your retrieval scores
 
-Add a summary row or a separate `results/scores.md` file:
+Add a summary row or a separate `runs/scores.md` file:
 
 ```
 Run: 001
@@ -384,7 +384,7 @@ Record the scores in `gpt_score` and the explanation in `gpt_notes`.
 
 ### Record your generation scores
 
-Add to your `results/scores.md`:
+Add to your `runs/scores.md`:
 
 ```
 Generation
@@ -425,7 +425,7 @@ Once you have both retrieval and generation scores recorded, read them as a syst
 
 ### What your baseline document looks like when complete
 
-Your `results/scores.md` is your baseline. It should contain:
+Your `runs/scores.md` is your baseline. It should contain:
 
 ```
 # Evaluation Baseline — Run 001
@@ -474,7 +474,7 @@ Once you have your baseline:
 |---|---|
 | Fix high hallucination rate | Before any other improvement work |
 | Run Step 2–4 again after a prompt change | To see if the change helped or hurt |
-| Change chunk size and re-run | A/B test — see [RAG Evaluation Playbook](rag-evaluation-playbook.md) |
+| Change chunk size and re-run | A/B test — see [RAG Evaluation Playbook](../docs/testing/rag-evaluation-playbook.md) |
 | Expand golden dataset to 50+ rows | When you want statistically reliable comparisons |
 | Add RAGAS evaluation metrics | When manual scoring becomes too slow for your dataset size |
 

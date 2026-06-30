@@ -6,8 +6,8 @@ Setup (one time):
     # .env contains:  DIFY_API_KEY=app-...   (App → API Access → API Key in the Dify UI)
 
 Usage:
-    python scripts/run_evaluation.py
-    # or, without a .env file:  DIFY_API_KEY=app-... python scripts/run_evaluation.py
+    python3.11 golden-dataset/run_evaluation.py
+    # or, without a .env file:  DIFY_API_KEY=app-... python3.11 golden-dataset/run_evaluation.py
 
 Rate limits (Google Gemini free tier, etc.):
     The underlying LLM/embedding provider caps requests per minute (RPM). To stay
@@ -19,10 +19,10 @@ Rate limits (Google Gemini free tier, etc.):
         BATCH_PAUSE     seconds to pause between batches            (default 60)
 
     Example — slower pacing for a tight free-tier limit:
-        REQUEST_DELAY=6 BATCH_SIZE=8 BATCH_PAUSE=70 python scripts/run_evaluation.py
+        REQUEST_DELAY=6 BATCH_SIZE=8 BATCH_PAUSE=70 python3.11 golden-dataset/run_evaluation.py
 
 Output:
-    results/run-001.csv  — one row per question, actual answers + retrieved chunks
+    golden-dataset/runs/run-001.csv  — one row per question, actual answers + retrieved chunks
     captured. Written incrementally after every question, so a rate-limit crash
     mid-run does not lose completed work.
 
@@ -68,8 +68,8 @@ load_dotenv()
 # Read the API key from the environment — never hard-code secrets in the script.
 API_KEY = os.environ.get("DIFY_API_KEY", "")
 API_URL = "http://localhost/v1/chat-messages"
-GOLDEN_DATASET = "results/golden-dataset.csv"
-OUTPUT_FILE = "results/run-001.csv"
+GOLDEN_DATASET = "golden-dataset/golden-dataset.csv"
+OUTPUT_FILE = "golden-dataset/runs/run-001.csv"
 
 # --- Rate-limit pacing (override via environment variables) ----------------
 # The LLM/embedding provider behind Dify (e.g. Google Gemini free tier) caps
@@ -277,7 +277,7 @@ def main():
     print(f"Rows with expected chunk (scoreable): {total}")
     print(f"Chunks found:        {found}")
     print(f"Recall@5 (rough):    {recall:.2f}")
-    print(f"\nDone. Open results/run-001.csv to review.")
+    print(f"\nDone. Open golden-dataset/runs/run-001.csv to review.")
 
 
 if __name__ == "__main__":
