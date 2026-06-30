@@ -1,6 +1,6 @@
 # RAG Testing Toolkit — the three levels and the tools behind them
 
-The companion to [RAG Testing Scenarios](rag-tester-faq.md). Every scenario in that doc is tagged with how you'd realistically test it — **Manual**, **Scripted**, or **Eval tooling**. This doc explains what those levels mean, what tools sit under each, how to set them up, and — the question everyone actually asks — *which tool should I use when?*
+Every RAG test can be run at one of three levels — **Manual**, **Scripted**, or **Eval tooling**. This doc explains what those levels mean, what tools sit under each, how to set them up, and — the question everyone actually asks — *which tool should I use when?*
 
 The short version: a functional tester can own far more of RAG testing than people expect. You only reach for the heavier tooling when you need to *measure quality across many answers*, which is the one thing human eyeballing can't do reliably.
 
@@ -213,7 +213,7 @@ BLEU, ROUGE-L, and GPTScore live entirely in that second row. They say nothing a
 | **ROUGE-L** | longest common subsequence vs reference | **Yes** | Free, instant, deterministic | Whether key facts got covered | Paraphrases, meaning |
 | **GPTScore** | an LLM judges the answer's quality | No (or optional) | $$ per call, non-deterministic | Meaning, paraphrase, **hallucination** | Consistency — judge varies, prompt-sensitive |
 
-BLEU and ROUGE-L are **lexical** — they compare *words*, so they need a known-good reference answer to compare against, which means they sit downstream of your golden dataset ([Q16](rag-tester-faq.md)). GPTScore is **semantic** — an LLM reads the answer and rates it, so it catches the things word-matching can't.
+BLEU and ROUGE-L are **lexical** — they compare *words*, so they need a known-good reference answer to compare against, which means they sit downstream of your golden dataset (see the [Golden Dataset Guide](golden-dataset-guide.md)). GPTScore is **semantic** — an LLM reads the answer and rates it, so it catches the things word-matching can't.
 
 **How they relate to RAGAS:** RAGAS's faithfulness and answer-relevancy metrics are GPTScore-style metrics under the hood — LLM-as-judge, just specialised for RAG (faithfulness judges the answer *against the retrieved context*). So GPTScore is the general technique "let an LLM grade the answer," and RAGAS faithfulness/relevancy is that same technique packaged and made retrieval-aware. BLEU and ROUGE-L are the older, cheaper, retrieval-blind cousins that just count word overlap.
 
@@ -255,7 +255,7 @@ A tool is usually built to nail one or two of these brilliantly. That's why team
 
 A tool can be excellent on one axis and mediocre on another. That's the real reason "one tool to rule them all" doesn't quite exist — not capability gaps, but that these are differently *shaped* problems.
 
-**The part no tool does for you.** The hardest, most valuable piece is tool-agnostic: building a good golden dataset (the right questions, correct expected answers, known source chunks — see [Q16](rag-tester-faq.md)). Every tool here just *runs* against that dataset. Garbage dataset, garbage scores, no matter the tool. So the test *design* matters far more than the tool *choice* — which is good news, because design is exactly what a tester is good at.
+**The part no tool does for you.** The hardest, most valuable piece is tool-agnostic: building a good golden dataset (the right questions, correct expected answers, known source chunks — see the [Golden Dataset Guide](golden-dataset-guide.md)). Every tool here just *runs* against that dataset. Garbage dataset, garbage scores, no matter the tool. So the test *design* matters far more than the tool *choice* — which is good news, because design is exactly what a tester is good at.
 
 **The practical takeaway:** you don't need a toolbox to start. Manual testing plus **RAGAS and pytest** is a complete eval setup for this project. The other tools are specialists you bring in only when a specific scenario outgrows what RAGAS measures — Promptfoo for adversarial (Q15), DeepEval for a hard CI gate (Q17), TruLens for production monitoring. Not day-one purchases.
 

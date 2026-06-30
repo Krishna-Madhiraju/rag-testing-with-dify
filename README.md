@@ -57,26 +57,31 @@ rag-demo/
 ├── dify/                        # Dify platform (cloned repo)
 │   └── docker/                  # Docker Compose setup — run all commands from here
 ├── docs/
+│   ├── concepts/
+│   │   ├── how-rag-works.md             # START HERE — the RAG pipeline + test implications
+│   │   └── glossary.md                  # RAG terminology reference
 │   ├── setup/
-│   │   └── dify-setup.md               # Step-by-step Dify configuration guide
-│   ├── reference/
-│   │   ├── glossary.md                 # RAG terminology reference
-│   │   ├── rag-interview-prep.md       # Key terms + 12 interview Q&As for RAG testing roles
-│   │   ├── rag-tester-faq.md           # Tester FAQ — considerations and interview guide
-│   │   ├── rag-testing-toolkit.md      # Testing levels and tools (manual/scripted/RAGAS)
-│   │   ├── golden-dataset-guide.md     # How to build and use golden datasets for regression testing
-│   │   ├── ragas-intro.md              # How RAGAS TestsetGenerator works — components, flow, question types
-│   │   └── quizzes/
-│   │       ├── rag-testing-quiz.md    # Quiz 1 — pipeline, chunking, retrieval basics (10 Q&As)
-│   │       ├── rag-testing-quiz-2.md  # Quiz 2 — evaluation metrics, BLEU/ROUGE/RAGAS (10 Q&As)
-│   │       └── rag-testing-quiz-3.md  # Quiz 3 — retrieval internals, Advanced RAG, adversarial (10 Q&As)
+│   │   └── dify-setup.md                # Step-by-step Dify configuration guide
 │   ├── testing/
-│   │   ├── first-evaluation.md         # Step-by-step guide to running your first RAG evaluation
-│   │   ├── test-strategy.md            # One-page test strategy for the RAG pipeline
-│   │   ├── rag-evaluation-playbook.md  # How to execute RAG evaluation — metrics, techniques, A/B testing
-│   │   └── functional-test-scenarios.md # 67 functional test cases
+│   │   ├── first-evaluation.md          # Run your first end-to-end RAG evaluation
+│   │   ├── test-strategy.md             # One-page test strategy for the RAG pipeline
+│   │   ├── rag-evaluation-playbook.md   # How to execute evaluation — metrics, A/B testing
+│   │   ├── functional-test-scenarios.md # 74 functional test cases
+│   │   ├── golden-dataset-guide.md      # Build and use golden datasets for regression testing
+│   │   ├── ragas-intro.md               # How RAGAS TestsetGenerator works — components, flow
+│   │   └── rag-testing-toolkit.md       # Testing levels and tools (manual/scripted/RAGAS)
+│   ├── going-further/
+│   │   ├── resources.md                 # Curated external reading + references
+│   │   └── quizzes/
+│   │       ├── rag-testing-quiz.md       # Quiz 1 — pipeline, chunking, retrieval basics
+│   │       ├── rag-testing-quiz-2.md     # Quiz 2 — evaluation metrics, BLEU/ROUGE/RAGAS
+│   │       └── rag-testing-quiz-3.md     # Quiz 3 — retrieval internals, Advanced RAG
 │   └── sample-data/
 │       └── orion-technologies-employee-handbook.pdf  # Test document
+├── results/
+│   └── golden-dataset.csv       # 60-row golden dataset for the Orion HR Assistant
+├── scripts/
+│   └── run_evaluation.py        # Runs the golden dataset through the assistant via the Dify API
 └── README.md
 ```
 
@@ -161,9 +166,9 @@ curl -X POST http://localhost/v1/chat-messages \
 | Document | What's in it |
 |---|---|
 | [test-strategy.md](docs/testing/test-strategy.md) | Scope, risk areas, metrics, release gates, test cadence |
-| [functional-test-scenarios.md](docs/testing/functional-test-scenarios.md) | 67 test cases — in-scope, paraphrase, ambiguous, adversarial, multi-hop, out-of-scope |
-| [rag-testing-toolkit.md](docs/reference/rag-testing-toolkit.md) | Manual / scripted / eval tooling levels, RAGAS setup, which tool to use when |
-| [rag-tester-faq.md](docs/reference/rag-tester-faq.md) | Scenario-based considerations — what to check when documents, models, or config change |
+| [functional-test-scenarios.md](docs/testing/functional-test-scenarios.md) | 74 test cases — in-scope, paraphrase, ambiguous, adversarial, multi-hop, out-of-scope, multi-turn, tone |
+| [rag-testing-toolkit.md](docs/testing/rag-testing-toolkit.md) | Manual / scripted / eval tooling levels, RAGAS setup, which tool to use when |
+| [rag-evaluation-playbook.md](docs/testing/rag-evaluation-playbook.md) | How to execute evaluation — retrieval metrics, generation scoring, A/B testing |
 
 ---
 
@@ -210,27 +215,35 @@ docker system prune            # remove unused images and containers
 
 ## Resources
 
-### This project
-- [First RAG Evaluation](docs/testing/first-evaluation.md) — step-by-step guide: build a golden dataset, query the Orion HR Assistant (via API or UI), score retrieval and generation, document your baseline
-- [Test Strategy](docs/testing/test-strategy.md) — scope, risk areas, test types, cadence, and release gates
-- [RAG Evaluation Playbook](docs/testing/rag-evaluation-playbook.md) — how to execute evaluation: retrieval metrics, generation scoring, prompt sensitivity, A/B testing
-- [Functional Test Scenarios](docs/testing/functional-test-scenarios.md) — 67 test cases
-- [RAG Testing Toolkit](docs/reference/rag-testing-toolkit.md) — manual / scripted / eval tooling levels and RAGAS setup
-- [Golden Dataset Guide](docs/reference/golden-dataset-guide.md) — how to build golden datasets manually, synthetically, and at scale; regression testing workflow
-- [Introduction to RAGAS](docs/reference/ragas-intro.md) — how RAGAS TestsetGenerator works: components, internal flow, question types, and Python concepts needed to follow the setup
-- [RAG Testing Quiz 1](docs/reference/quizzes/rag-testing-quiz.md) — pipeline flow, chunking, retrieval, temperature, golden datasets, release gates
-- [RAG Testing Quiz 2](docs/reference/quizzes/rag-testing-quiz-2.md) — BLEU, ROUGE-L, GPTScore, RAGAS metrics, A/B testing, CI vs release gate design
-- [RAG Testing Quiz 3](docs/reference/quizzes/rag-testing-quiz-3.md) — dense vs sparse retrieval, HNSW, hybrid search, HyDE, adversarial test design
-- [RAG Tester FAQ](docs/reference/rag-tester-faq.md) — scenario-based considerations and interview prep
-- [RAG Interview Prep](docs/reference/rag-interview-prep.md) — key terms + 12 interview Q&As
-- [RAG Terminology Glossary](docs/reference/glossary.md) — every RAG term, explained in plain language
+A suggested reading order — concepts first, then set up, then test:
+
+**1 · Learn the concepts**
+- [How RAG Works](docs/concepts/how-rag-works.md) — **start here.** The pipeline end to end, with the testing implication at each step
+- [RAG Terminology Glossary](docs/concepts/glossary.md) — every RAG term, explained in plain language
+
+**2 · Set up the pipeline**
 - [Dify Setup Guide](docs/setup/dify-setup.md) — step-by-step Dify configuration
+
+**3 · Test it**
+- [First RAG Evaluation](docs/testing/first-evaluation.md) — build a golden dataset, query the Orion HR Assistant, score retrieval and generation, record a baseline
+- [Test Strategy](docs/testing/test-strategy.md) — scope, risk areas, test types, cadence, and release gates
+- [RAG Evaluation Playbook](docs/testing/rag-evaluation-playbook.md) — how to execute evaluation: retrieval metrics, generation scoring, A/B testing
+- [Functional Test Scenarios](docs/testing/functional-test-scenarios.md) — 74 test cases across 12 categories (in-scope, paraphrase, adversarial, multi-hop, multi-turn, tone, and more)
+- [Golden Dataset Guide](docs/testing/golden-dataset-guide.md) — build golden datasets manually, synthetically, and at scale
+- [Introduction to RAGAS](docs/testing/ragas-intro.md) — how RAGAS TestsetGenerator works: components, flow, question types
+- [RAG Testing Toolkit](docs/testing/rag-testing-toolkit.md) — manual / scripted / eval tooling levels and RAGAS setup
+
+**4 · Going further (optional)**
+- [Further Resources](docs/going-further/resources.md) — curated external reading: surveys, frameworks, leaderboards, primary sources
+- [Quiz 1](docs/going-further/quizzes/rag-testing-quiz.md) · [Quiz 2](docs/going-further/quizzes/rag-testing-quiz-2.md) · [Quiz 3](docs/going-further/quizzes/rag-testing-quiz-3.md) — self-check on pipeline, metrics, and retrieval internals
 
 ### External
 - [Dify Documentation](https://docs.dify.ai)
 - [RAGAS — RAG Evaluation Framework](https://docs.ragas.io)
 - [Weaviate Vector Database](https://weaviate.io/developers/weaviate)
 - [What is RAG? (AWS)](https://aws.amazon.com/what-is/retrieval-augmented-generation/)
+
+> More curated external links — surveys, the MTEB leaderboard, security references — are in [docs/going-further/resources.md](docs/going-further/resources.md).
 
 ---
 

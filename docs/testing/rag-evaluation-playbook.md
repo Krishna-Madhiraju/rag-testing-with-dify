@@ -1,6 +1,6 @@
 # RAG Evaluation Playbook
 
-A practical guide for executing RAG system evaluation — what to test, how to test it, which metrics to use, and how to interpret results. Complements the [Test Strategy](test-strategy.md) (scope and sign-off) and the [Golden Dataset Guide](../reference/golden-dataset-guide.md) (building your test data).
+A practical guide for executing RAG system evaluation — what to test, how to test it, which metrics to use, and how to interpret results. Complements the [Test Strategy](test-strategy.md) (scope and sign-off) and the [Golden Dataset Guide](golden-dataset-guide.md) (building your test data).
 
 The approach here is based on three pillars that must work together:
 
@@ -195,7 +195,7 @@ Use the golden dataset to compare two configurations — for example, chunk size
 
 1. **Change one thing at a time.** If you change chunking and embedding model simultaneously, you cannot isolate the cause of any score change.
 2. **Use the same golden dataset for both runs.** Do not regenerate the dataset between runs — question distribution changes will contaminate the comparison.
-3. **Require statistical significance.** With fewer than ~246 golden entries, a score difference of 2–3% is likely noise. See [Golden Dataset Guide](../reference/golden-dataset-guide.md) for sample size guidance.
+3. **Require statistical significance.** With fewer than ~246 golden entries, a score difference of 2–3% is likely noise. See [Golden Dataset Guide](golden-dataset-guide.md) for sample size guidance.
 
 ### What to compare
 

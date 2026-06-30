@@ -2,7 +2,7 @@
 
 A reference guide to every term you will encounter when building, running, and testing RAG applications. Terms are grouped by topic, not alphabetical order, so related concepts sit together.
 
-> **Interview prep?** Start with [rag-interview-prep.md](rag-interview-prep.md) — it covers the 20 core terms with a tester angle and 12 interview Q&As. Come back here when you hit a term that needs more depth.
+> **New to RAG?** Start with [How RAG Works](how-rag-works.md) — it walks the pipeline end to end with the testing implication at each step. Come back here when you hit a term that needs a quick definition.
 
 ---
 
@@ -84,10 +84,13 @@ The vector database used by Dify in this project. Weaviate stores your document 
 The data structure inside the vector database that makes similarity search fast. Without an index, searching would require comparing the query vector to every stored vector one by one (too slow at scale).
 
 **HNSW (Hierarchical Navigable Small World)**
-The most widely used indexing algorithm for vector search. It builds a multi-layer graph where similar vectors are connected. At query time it navigates the graph efficiently to find approximate nearest neighbours. Much faster than exhaustive search with only a small accuracy trade-off.
+The most widely used indexing algorithm for vector search, and the default in Weaviate (this project). It builds a multi-layer graph where similar vectors are connected: sparse top layers with long-range links for coarse navigation, and a dense bottom layer containing every vector. At query time it enters the top layer, greedily hops toward the query, and drops down a layer at a time — like zooming in on a map from country to street level — then collects the top-K from the bottom layer. Much faster than exhaustive search with only a small accuracy trade-off. The key search-time dial is **`ef`** (the search beam width): higher `ef` = higher recall but slower queries. Build-time dials are `M` and `ef_construction` (more neighbour links = better recall, bigger index, slower build). Handles incremental inserts and deletes well, which suits RAG's add-a-document workload. For testing: if a chunk was indexed but never appears in top-K, try raising `ef` — if recall jumps, the index was the bottleneck, not your chunking or embedding.
+
+**IVF (Inverted File Index)**
+A clustering-based alternative to HNSW. At build time it runs k-means over all vectors to split them into N clusters, each with a **centroid** (the cluster's average vector); every chunk is filed under its nearest centroid (the "inverted file": centroid → list of vectors). At query time it (1) compares the query to the centroids and picks the closest few, then (2) only scans the vectors inside those clusters — ignoring the rest. The key dial is **`nprobe`**: how many clusters to open and scan. `nprobe=1` is fastest but risky; higher `nprobe` raises recall at the cost of speed. Cheaper to build and lighter on memory than HNSW (especially as **IVF-PQ**, which also compresses vectors), so it wins on massive, mostly-static datasets where RAM is the constraint. Two caveats for testing: (1) its signature failure is a true-nearest chunk sitting just across a cluster boundary you didn't probe — it gets missed entirely until you raise `nprobe`; (2) adding many vectors without re-running k-means degrades the clusters over time, so IVF needs periodic **re-training** (re-test Recall@K after bulk ingestion).
 
 **ANN (Approximate Nearest Neighbour) Search**
-Finding vectors that are approximately (not exactly) closest to a query vector. The approximation is a deliberate trade-off: exact search is too slow at scale, and for RAG the top-5 approximate results are almost always as useful as the exact top-5.
+Finding vectors that are approximately (not exactly) closest to a query vector — what both HNSW and IVF do. The approximation is a deliberate trade-off: exact (brute-force / "flat") search compares the query to every stored vector, which is too slow at scale, and for RAG the top-5 approximate results are almost always as useful as the exact top-5. Because it is *approximate*, the same query can occasionally return slightly different chunks across runs or after re-indexing — worth a self-consistency check before blaming the LLM's temperature.
 
 ---
 
