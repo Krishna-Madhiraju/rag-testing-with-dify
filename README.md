@@ -72,7 +72,8 @@ rag-demo/
 │   │   ├── advanced-evaluation-metrics.md    # BERTScore, MRR, NDCG — completing the metrics stack
 │   │   ├── rag-vs-api-testing.md             # Why RAG testing is harder — non-determinism, silent retrieval failure, two surfaces
 │   │   ├── comparing-rag-configurations.md   # Controlled experiment design, scorecard, reading results by query type, declaring a winner
-│   │   └── rag-testing-toolkit.md            # Testing levels and tools (manual/scripted/RAGAS)
+│   │   ├── rag-testing-toolkit.md            # Testing levels and tools (manual/scripted/RAGAS)
+│   │   └── adversarial-testing.md            # Hallucination, false premise, prompt injection, document injection, conflicting docs
 │   ├── going-further/
 │   │   ├── resources.md                 # Curated external reading + references
 │   │   └── quizzes/
@@ -80,16 +81,16 @@ rag-demo/
 │   │       ├── rag-testing-quiz-2.md     # Quiz 2 — evaluation metrics, BLEU/ROUGE/RAGAS
 │   │       └── rag-testing-quiz-3.md     # Quiz 3 — retrieval internals, Advanced RAG
 │   └── sample-data/
-│       └── orion-technologies-employee-handbook.pdf  # Test document
+│       ├── orion-technologies-employee-handbook.pdf  # Test document
+│       └── generate_handbook.py                      # Script that generated the test document
 ├── golden-dataset/              # Everything for golden dataset evaluation — end to end
-│   ├── golden-dataset.csv               # The dataset (questions, reference answers, expected chunks)
-│   ├── golden-dataset-remaining.csv     # Additional rows not yet merged into main dataset
+│   ├── golden-dataset.csv               # The dataset — 60 rows (questions, reference answers, expected chunks)
 │   ├── guide.md                         # Why golden datasets, how to build one, generation approaches
 │   ├── first-evaluation.md              # Step-by-step: run the dataset, score retrieval + generation
 │   ├── run_evaluation.py                # Script: sends every question to the Orion HR Assistant
 │   ├── score_results.py                 # Script: computes BLEU, ROUGE-L, and GPTScore on results
-│   └── runs/                            # Output from each evaluation run
-│       └── (run-001.csv, scores.md appear here after running)
+│   ├── ragas_eval.py                    # Script: runs Faithfulness, Answer Relevancy, Context Precision/Recall via RAGAS
+│   └── runs/                            # Output from each evaluation run (run-001.csv is a sample)
 └── README.md
 ```
 
@@ -169,15 +170,7 @@ curl -X POST http://localhost/v1/chat-messages \
   }'
 ```
 
-### Test documents
-
-| Document | What's in it |
-|---|---|
-| [test-strategy.md](docs/testing/test-strategy.md) | Scope, risk areas, metrics, release gates, test cadence |
-| [functional-test-scenarios.md](docs/testing/functional-test-scenarios.md) | 74 test cases — in-scope, paraphrase, ambiguous, adversarial, multi-hop, out-of-scope, multi-turn, tone |
-| [rag-testing-toolkit.md](docs/testing/rag-testing-toolkit.md) | Manual / scripted / eval tooling levels, RAGAS setup, which tool to use when |
-| [rag-evaluation-playbook.md](docs/testing/rag-evaluation-playbook.md) | How to execute evaluation — retrieval metrics, generation scoring, A/B testing |
-| [golden-dataset/](golden-dataset/) | Golden dataset, evaluation scripts, and run results — all in one place |
+Full reading list, in suggested order: see [Resources](#resources) below.
 
 ---
 
@@ -241,14 +234,14 @@ A suggested reading order — concepts first, then set up, then test:
 - [RAGAS Evaluation Metrics](docs/testing/ragas-evaluation-metrics.md) — Faithfulness, Answer Relevancy, Context Precision, Context Recall: how each works, what it catches, when to use it
 - [Adversarial Testing](docs/testing/adversarial-testing.md) — five failure modes (hallucination, false premise, prompt injection, document injection, conflicting docs); how to write cases and classify severity
 
-**3 · Test it — go deeper**
+**4 · Test it — go deeper**
 - [Chunking Strategies](docs/testing/chunking-strategies.md) — how chunk size, overlap, and strategy affect retrieval; failure modes by query type; how to run a before/after comparison
 - [Comparing RAG Configurations](docs/testing/comparing-rag-configurations.md) — controlled experiment design, scorecard by config type, reading results by query type, declaring a winner
 - [Advanced Evaluation Metrics](docs/testing/advanced-evaluation-metrics.md) — BERTScore, MRR, and NDCG: the metrics that complete the picture beyond BLEU/ROUGE and Recall@K
 - [Introduction to RAGAS](docs/testing/ragas-intro.md) — how RAGAS TestsetGenerator works: components, flow, question types
 - [RAG Testing Toolkit](docs/testing/rag-testing-toolkit.md) — manual / scripted / eval tooling levels and RAGAS setup
 
-**Golden dataset evaluation** (end to end in one folder: `golden-dataset/`)
+**5 · Golden dataset evaluation** (end to end in one folder: `golden-dataset/`)
 - [Golden Dataset Guide](golden-dataset/guide.md) — why golden datasets, how to build one, generation approaches
 - [First RAG Evaluation](golden-dataset/first-evaluation.md) — run the dataset, score retrieval and generation, record a baseline
 - Scripts — run in this order:
@@ -257,7 +250,7 @@ A suggested reading order — concepts first, then set up, then test:
   3. `ragas_eval.py` — runs Faithfulness, Answer Relevancy, Context Precision, Context Recall via RAGAS
 - Results land in `golden-dataset/runs/`
 
-**4 · Going further (optional)**
+**6 · Going further (optional)**
 - [Further Resources](docs/going-further/resources.md) — curated external reading: surveys, frameworks, leaderboards, primary sources
 - [Quiz 1](docs/going-further/quizzes/rag-testing-quiz.md) · [Quiz 2](docs/going-further/quizzes/rag-testing-quiz-2.md) · [Quiz 3](docs/going-further/quizzes/rag-testing-quiz-3.md) — self-check on pipeline, metrics, and retrieval internals
 
