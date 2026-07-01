@@ -16,6 +16,7 @@ The focus is the *testing* side: how RAG systems fail, how to measure quality, a
 - [Stopping and Restarting](#stopping-and-restarting)
 - [Troubleshooting](#troubleshooting)
 - [Resources](#resources)
+- [A Note on How This Was Built](#a-note-on-how-this-was-built)
 
 ---
 
@@ -282,6 +283,12 @@ A suggested reading order — concepts first, then set up, then test:
 - [What is RAG? (AWS)](https://aws.amazon.com/what-is/retrieval-augmented-generation/)
 
 > More curated external links — surveys, the MTEB leaderboard, security references — are in [docs/going-further/resources.md](docs/going-further/resources.md).
+
+---
+
+## A Note on How This Was Built
+
+This project was built with [Claude Code](https://claude.com/claude-code) as a learning partner throughout — not just for writing code, but for actually learning RAG. It explained mechanisms before jumping to configuration, connected every concept back to "how would you test this," and caught real gaps along the way (stale model references, broken doc links, an outdated test-scenario count) that would have been easy to miss working alone. If you're learning a new technical domain, pairing with it this way is genuinely worth trying.
 
 ---
 
