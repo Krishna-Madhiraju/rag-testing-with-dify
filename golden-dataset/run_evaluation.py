@@ -23,13 +23,15 @@ Rate limits (Google Gemini free tier, etc.):
 
 Output:
     golden-dataset/runs/run-001.csv  — one row per question, actual answers + retrieved chunks
-    captured. Written incrementally after every question, so a rate-limit crash
-    mid-run does not lose completed work.
+    captured. This file is raw: retrieval + generation output only, no scores.
+    Written incrementally after every question, so a rate-limit crash mid-run
+    does not lose completed work.
 
-What this script does NOT do:
-    - Calculate BLEU/ROUGE scores (Step 3)
-    - Run GPTScore (Step 4)
-    Those steps happen after you have the raw results.
+What this script does NOT do — scoring happens separately, each in its own folder,
+reading this file without modifying it:
+    - golden-dataset/bleu-rouge/score_bleu_rouge.py  — BLEU, ROUGE-L
+    - golden-dataset/gptscore/score_gptscore.py       — GPTScore (Claude as judge)
+    - golden-dataset/ragas/ragas_eval.py               — RAGAS metrics
 """
 
 import csv
@@ -83,8 +85,7 @@ GOLDEN_COLS = ["question", "reference_answer", "expected_chunk", "source_doc", "
 
 # Columns you fill in from the API response
 RESULT_COLS = ["actual_answer", "retrieved_chunks", "chunk_found", "chunk_rank",
-               "retrieval_score_rank1", "bleu_score", "rouge_score",
-               "gpt_score", "gpt_notes", "flags"]
+               "retrieval_score_rank1", "flags"]
 
 
 def query_assistant(question: str, max_retries: int = 5) -> dict:
@@ -200,10 +201,6 @@ def evaluate_row(row: dict) -> dict:
         result["chunk_found"] = chunk_found
         result["chunk_rank"] = chunk_rank
         result["retrieval_score_rank1"] = round(top_score, 4)
-        result["bleu_score"] = ""
-        result["rouge_score"] = ""
-        result["gpt_score"] = ""
-        result["gpt_notes"] = ""
         result["flags"] = ""
         return result
 

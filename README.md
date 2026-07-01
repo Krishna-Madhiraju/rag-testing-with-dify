@@ -91,9 +91,17 @@ rag-demo/
 │   ├── guide.md                         # Why golden datasets, how to build one, generation approaches
 │   ├── first-evaluation.md              # Step-by-step: run the dataset, score retrieval + generation
 │   ├── run_evaluation.py                # Script: sends every question to the Orion HR Assistant
-│   ├── score_results.py                 # Script: computes BLEU, ROUGE-L, and GPTScore on results
-│   ├── ragas_eval.py                    # Script: runs Faithfulness, Answer Relevancy, Context Precision/Recall via RAGAS
-│   └── runs/                            # Output from each evaluation run (run-001.csv is a sample)
+│   ├── runs/                            # Raw output from run_evaluation.py — no scores, just Q&A + retrieval
+│   │   └── run-001.csv                        # One row per question: actual answer, retrieved chunks, recall check
+│   ├── bleu-rouge/                      # BLEU + ROUGE-L (lexical n-gram metrics) — self-contained
+│   │   ├── score_bleu_rouge.py                # Script: reads runs/run-001.csv, never modifies it
+│   │   └── results/                           # This tool's own scored CSV + summary
+│   ├── gptscore/                        # GPTScore (Claude as judge) — self-contained
+│   │   ├── score_gptscore.py                  # Script: reads runs/run-001.csv, never modifies it
+│   │   └── results/                           # This tool's own scored CSV + summary
+│   └── ragas/                           # RAGAS (Faithfulness, Answer Relevancy, Context Precision/Recall) — self-contained
+│       ├── ragas_eval.py                      # Script: reads runs/run-001.csv, never modifies it
+│       └── results/                           # This tool's own scored CSV + summary
 └── README.md
 ```
 
@@ -249,11 +257,11 @@ A suggested reading order — concepts first, then set up, then test:
 **5 · Golden dataset evaluation** (end to end in one folder: `golden-dataset/`)
 - [Golden Dataset Guide](golden-dataset/guide.md) — why golden datasets, how to build one, generation approaches
 - [First RAG Evaluation](golden-dataset/first-evaluation.md) — run the dataset, score retrieval and generation, record a baseline
-- Scripts — run in this order:
-  1. `run_evaluation.py` — sends every question to the Orion HR Assistant, writes `runs/run-001.csv`
-  2. `score_results.py` — computes BLEU, ROUGE-L, and GPTScore on the results
-  3. `ragas_eval.py` — runs Faithfulness, Answer Relevancy, Context Precision, Context Recall via RAGAS
-- Results land in `golden-dataset/runs/`
+- Step 1 (always first): `run_evaluation.py` — sends every question to the Orion HR Assistant, writes the raw `runs/run-001.csv` (no scores, never modified afterward)
+- Step 2 — three independent, self-contained scoring tools, each reads `runs/run-001.csv` and writes only into its own folder. Run any or all of them, in any order:
+  - `bleu-rouge/score_bleu_rouge.py` → `bleu-rouge/results/`
+  - `gptscore/score_gptscore.py` → `gptscore/results/`
+  - `ragas/ragas_eval.py` → `ragas/results/`
 
 **6 · Going further (optional)**
 - [Further Resources](docs/going-further/resources.md) — curated external reading: surveys, frameworks, leaderboards, primary sources

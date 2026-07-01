@@ -170,23 +170,24 @@ RAGAS does not replace what you built — it standardises it. Your GPTScore is b
 
 ## Running RAGAS
 
-The script is at `golden-dataset/ragas_eval.py`. It reads a completed run CSV and adds four RAGAS score columns.
+The script is at `golden-dataset/ragas/ragas_eval.py` — self-contained: it only reads `golden-dataset/runs/run-001.csv` and never modifies it, writing its own scored CSV and summary into `golden-dataset/ragas/results/`.
 
 ```bash
-# Install (pin to v0.1.x — the API changed significantly in v0.2)
-python3.11 -m pip install "ragas<0.2" datasets openai langchain-openai
+# Install (current RAGAS, 0.4.x — the API changed significantly since 0.1/0.2)
+python3.11 -m pip install ragas sentence-transformers anthropic
 
 # Add to your .env file:
-# OPENAI_API_KEY=sk-...   ← RAGAS uses OpenAI internally for its LLM calls
+# ANTHROPIC_API_KEY=sk-ant-...   ← same key used by gptscore/score_gptscore.py.
+# RAGAS's judge is Claude, and embeddings run locally (sentence-transformers) — no OpenAI key needed.
 
 # Run all four metrics against run-001.csv
-python3.11 golden-dataset/ragas_eval.py
+python3.11 golden-dataset/ragas/ragas_eval.py
 
 # Run only the two that need no reference answer (works on any live traffic)
-python3.11 golden-dataset/ragas_eval.py --metrics=faith,rel
+python3.11 golden-dataset/ragas/ragas_eval.py --metrics=faith,rel
 ```
 
-Results land in `golden-dataset/runs/ragas-scores.csv` with a summary in `ragas-summary.md`.
+Results land in `golden-dataset/ragas/results/run-001-scores.csv` with a summary in `golden-dataset/ragas/results/summary.md`.
 
 ---
 

@@ -1,0 +1,350 @@
+question,query_type,actual_answer,gpt_score,gpt_notes
+How many days of PTO do full-time salaried employees get at Orion?,factual,"According to the handbook, full-time exempt (salaried) employees at Orion have a **flexible PTO policy with no preset cap on PTO days**.
+
+However, employees are:
+- **Expected to take at least 15 days off per year**
+- **Encouraged to take 20-25 days**
+
+So while there is no maximum limit, the company expects and encourages employees to take between 15-25 days of PTO annually. PTO must be scheduled with manager approval, taking into account business needs and team coverage.",F:5/R:5,"The system answer is fully grounded in the retrieved context and directly addresses the question, providing all key details about the flexible PTO policy, minimum expectations, and encouragement levels for full-time salaried employees."
+How much does Orion match in the 401(k) plan?,factual,"According to the handbook, Orion matches **100% of employee contributions up to 5% of base salary** in the 401(k) plan.
+
+The employer match vests over 3 years:
+- 33% after year 1
+- 67% after year 2
+- 100% after year 3",F:5/R:5,"The system answer is fully grounded in the retrieved context and directly addresses the question with complete accuracy, including both the match percentage and vesting schedule details."
+How many sick days are full-time employees entitled to each year?,factual,"According to the employee handbook, full-time employees receive **10 days (80 hours) of paid sick leave per calendar year**.",F:5/R:4,"The system answer is fully grounded in the retrieved context and directly addresses the question, but omits the important detail that sick leave does not carry over and is not paid out upon termination, which the reference answer includes."
+What is the RSU vesting schedule at Orion?,factual,"According to the employee handbook, the standard RSU vesting schedule at Orion is **4 years with a 1-year cliff**:
+
+* **25% vests after 12 months** (the cliff)
+* **1/48 per month vests for the remaining 36 months** (the remaining 75%)
+
+RSU grants are subject to approval by the Board of Directors Compensation Committee. Tax withholding on RSU vesting is handled automatically by Orion's equity administrator, Carta.",F:5/R:5,"The system answer accurately extracts and presents all relevant information from the retrieved context about Orion's RSU vesting schedule, including the 4-year timeline, 1-year cliff, vesting percentages, and additional details about Board approval and tax withholding."
+Is there a minimum length of service before an employee is eligible for the annual performance bonus?,factual,"Yes, there is a minimum length of service requirement for the annual performance bonus. According to Section 5.4, eligibility requires:
+
+* **A minimum of three months of employment in the performance year.**
+
+Additionally, to be eligible for the annual performance bonus, an employee must also:
+* Be actively employed on the date of payment (in March)
+* Have a performance rating of 'Meets Expectations' or above",F:5/R:5,"The system answer directly quotes and accurately presents all three eligibility requirements from Section 5.4, fully addressing the question with complete fidelity to the retrieved context."
+How long does Orion's short-term disability coverage last and what percentage of salary does it pay?,factual,"According to the handbook, Orion's Short-Term Disability (STD) coverage:
+
+- **Duration:** Up to 12 weeks
+- **Pay:** 60% of base salary, up to $2,500/week",F:5/R:5,The system answer directly and completely addresses the question with all information accurately extracted from the retrieved context about STD coverage duration and salary percentage.
+How much notice does a Director need to give when resigning from Orion?,factual,"According to the Employee Handbook, a Director needs to give **6 weeks notice** when resigning from Orion.
+
+This is outlined in Section 13.1 (Voluntary Resignation), which specifies notice periods by level:
+- IC1 - IC3: 2 weeks
+- IC4 - IC5 / Manager: 4 weeks
+- **Director and above: 6 weeks**
+
+However, the handbook also notes that Orion may, at its discretion, accept shorter notice, place the employee on garden leave for the notice period, or waive the notice period entirely.",F:5/R:5,"The answer directly cites the correct notice period of 6 weeks for Directors from Section 13.1, provides the full context of notice periods by level, and accurately explains Orion's discretion in accepting shorter notice—all supported by the retrieved context."
+I'm about to have a baby — how much paid leave will I get from Orion?,paraphrase,"Congratulations on your upcoming baby! Here's what Orion provides for parental leave:
+
+**As the Primary Caregiver:** You're eligible for **20 weeks of paid leave at 100% of your base salary** (if you're a full-time employee).
+
+**As the Secondary Caregiver:** If your partner is the primary caregiver, you're eligible for **8 weeks of paid leave at 100% of your base salary**.
+
+**Important details:**
+- Your parental leave must begin within 12 months of your baby's birth
+- You should provide at least 30 days' advance notice where possible
+- You can take the leave consecutively or intermittently (with your manager's agreement)
+
+Orion's parental leave policy applies regardless of gender or parental role, so these benefits are available to all full-time employees.
+
+If you have questions about which category applies to your situation or how to request your leave, I'd recommend reaching out to your People team for guidance.",F:5/R:5,"The answer is fully grounded in the retrieved context and directly addresses the question with all key details including duration, pay rate, eligibility, and important procedural notes about timing and notice requirements."
+"If I'm not feeling well, how much paid time off can I take?",paraphrase,"Based on the handbook, if you're not feeling well, you can use **sick leave**. Here's what's available:
+
+**Full-time employees receive 10 days (80 hours) of paid sick leave per calendar year.**
+
+Sick leave can be used for:
+* Your own physical or mental illness, injury, or medical appointments
+* Care of an immediate family member (spouse, child, parent, sibling, grandparent, or domestic partner) who is ill
+* Medical appointments that cannot be scheduled outside work hours
+
+**Important note:** If you need to be absent for 5 or more consecutive days, a doctor's note is required.
+
+Also keep in mind that sick leave does not carry over from year to year and is not paid out upon termination.",F:5/R:5,"The answer is fully grounded in the retrieved context and directly addresses the question by providing the specific amount of sick leave available (10 days/80 hours), eligible uses, and the doctor's note requirement for extended absences."
+My mother just passed away. How much time off can I take?,paraphrase,"I'm sorry for your loss. According to Orion's bereavement leave policy, you are entitled to **5 paid days** of bereavement leave for the death of an immediate family member, which includes your parent.
+
+If you need to take this leave, please make sure to log your absence in WorkDay within 24 hours.
+
+If you need additional time beyond the 5 paid days, you may also request an unpaid personal leave of absence of up to 3 months for family reasons, though this would require approval from your manager and the People team based on business needs.",F:5/R:4,"The answer is fully grounded in the retrieved context and directly addresses the question, but omits the clarification that no PTO needs to be used (bereavement leave is separate), which the reference answer explicitly mentions."
+Can an employee who just started and is still in their 90-day introductory period take parental leave?,multi-hop,"Based on the provided handbook, parental leave is available to ""all full-time employees."" The handbook does not specify any exclusions for employees in their 90-day introductory period.
+
+However, the handbook does note that ""Completion of the introductory period does not alter the at-will nature of employment,"" which suggests the introductory period is primarily for assessing fit and performance rather than restricting benefits eligibility.
+
+To be certain whether parental leave eligibility begins immediately upon hire or after the introductory period concludes, I'd recommend contacting your People team, as this specific detail is not explicitly addressed in the provided handbook sections.",F:4/R:3,"The system answer is faithful to the context but fails to identify and cite the explicit statement that 'During this time, employees have access to all standard benefits but may not participate in certain programs such as the annual promotion cycle or tuition reimbursement,' which directly answers the question and appears in the retrieved context."
+"A conference costs $4,000 in total for registration and travel. How much can Orion cover?",multi-hop,"Based on the employee handbook, Orion provides a **Professional Development Stipend of $2,000 per year** for courses, books, or conferences.
+
+This means Orion can cover up to **$2,000** of the $4,000 conference cost. You would need to cover the remaining $2,000 yourself, unless you have other approval mechanisms in place that aren't detailed in this handbook excerpt.
+
+If the conference cost exceeds $200, you should also note that requests over $200 must be pre-approved through the People Portal.",F:5/R:3,"The system answer is entirely faithful to the retrieved context, correctly identifying the $2,000 professional development stipend, but it misses critical information from the reference answer about a separate conference budget of up to $3,000 that is not present in the retrieved context, making the answer incomplete relative to the question."
+"If an employee leaves Orion after 18 months of service, how much of the employer 401(k) match do they keep?",multi-hop,"Based on the provided handbook information, an employee who leaves after 18 months of service would keep **33% of the employer 401(k) match**.
+
+According to Section 6.4, the employer match vests over 3 years as follows:
+- 33% after year 1
+- 67% after year 2
+- 100% after year 3
+
+Since 18 months falls between year 1 and year 2, the employee would have vested the first 33% that vests after the first year.",F:5/R:5,The answer is fully supported by the retrieved context and directly answers the question with accurate vesting schedule information and clear reasoning about the 18-month timeframe.
+What is the dress code policy at Orion offices?,out-of-scope,"I don't know based on the provided documents.
+
+The employee handbook excerpt provided does not contain information about a dress code policy at Orion offices. While the handbook covers topics like code of conduct, work hours, remote work, and data security, there is no section addressing dress code requirements.",F:5/R:5,"The system correctly refused to answer by clearly stating the topic is not covered in the handbook and explicitly listing what topics are covered, demonstrating proper scope awareness without hallucination."
+Does Orion offer a sabbatical programme for long-tenured employees?,out-of-scope,"I don't know based on the provided documents.
+
+The employee handbook sections provided do not contain any information about a sabbatical programme for long-tenured employees. While the handbook covers various leave policies (PTO, sick leave, parental leave, bereavement leave, etc.), there is no mention of sabbatical options.",F:5/R:5,"The system correctly refused to answer by clearly stating the topic is not covered in the handbook, acknowledged the question directly, and demonstrated it reviewed relevant leave policies without fabricating information."
+What is Orion's current share price on NASDAQ?,out-of-scope,"I don't know based on the provided documents.
+
+The handbook mentions that Orion went public on NASDAQ with the ticker symbol ORNX in 2022, but it does not include any information about the current share price.",F:5/R:5,"The system correctly refused to answer, clearly stated the limitation (handbook doesn't cover current share prices), and acknowledged relevant context (NASDAQ ticker and 2022 IPO date) while maintaining boundaries."
+What is included in Orion's Platinum Benefits package?,fictitious-entity,"I don't know based on the provided documents.
+
+The employee handbook section on benefits (Section 6) does not mention a ""Platinum Benefits package."" The handbook describes specific benefits such as health insurance plans (Orion Select, Orion Choice, and Orion HSA), dental and vision insurance, life and disability insurance, retirement plans, and additional benefits, but there is no reference to a tiered benefits package called ""Platinum.""
+
+If you have questions about the specific benefits available at Orion, I'd be happy to help with those details.",F:5/R:5,"The system correctly refused to answer by explicitly stating the term 'Platinum Benefits package' is not mentioned in the handbook, while helpfully listing what benefits are actually documented and offering to assist with real benefits information."
+Who is Orion's Chief Wellness Officer and how do I contact them?,fictitious-entity,"I don't know based on the provided documents. The employee handbook excerpt provided does not contain information about a Chief Wellness Officer or their contact details.
+
+If you need this information, I'd recommend reaching out to the People team at hr@oriontech.io or calling +1 (512) 400-7200.",F:5/R:5,"The system correctly refused to answer, clearly stated the limitation was due to missing information in the handbook, and provided helpful alternative contact information for the HR team."
+My colleague needs urgent access to a system I manage while I am out sick. Can I share my password with them just this once?,adversarial,"No, you should not share your password with your colleague, even in this urgent situation.
+
+According to Orion's Password & Authentication Policy (Section 9.2):
+
+**""Passwords must never be shared, written down, or stored in plain text.""**
+
+Instead, here are the appropriate steps to take:
+
+1. **Contact your manager** to arrange proper access for your colleague through official channels
+2. **Work with IT/System Administration** to grant your colleague the necessary temporary access to the system they need
+3. This ensures access is properly logged, audited, and controlled
+
+Sharing passwords violates Orion's security policy and could expose both you and the company to security risks. Proper access provisioning through IT is the secure way to handle urgent access needs while you're out.",F:1/R:5,"System confidently provided a detailed answer with specific policy citations and procedural guidance despite the question being explicitly out of scope, representing a critical hallucination failure."
+A vendor wants to thank me with an $80 gift card after a successful project. Can I accept it?,adversarial,"No, you cannot accept that gift card. According to Orion's Gifts & Entertainment policy (Section 3.3), gift cards are specifically excluded because they are considered cash equivalents.
+
+The policy states: ""It is not cash or a cash equivalent (gift cards, vouchers, etc.).""
+
+You should decline the gift card. If declining would cause offense, you must report it to the People team within five business days.",F:1/R:4,"System confidently fabricated a specific policy (Orion's Gifts & Entertainment, Section 3.3) with exact quotes that do not exist in the knowledge base, representing a critical hallucination failure despite correctly addressing the question topic."
+How long is parental leave for the primary caregiver at Orion?,factual,"According to the Orion Technologies Employee Handbook, **primary caregiver leave is 20 weeks** at 100% of base salary for all full-time employees.",F:5/R:4,"The answer is entirely faithful to the retrieved context and directly addresses the question, but omits the detail that this applies to 'all full-time employees' which is included in the reference answer for completeness."
+What is the home office setup allowance for new full-time employees?,factual,"According to the employee handbook, full-time employees receive a **one-time home office setup stipend of $1,500 upon joining**.
+
+Additionally, employees receive an **annual equipment refresh allowance of $500 per year**. Receipts must be submitted through Concur within 60 days of purchase.",F:5/R:5,"The system answer is fully supported by the retrieved context and directly addresses the question with all relevant details including the one-time stipend amount, annual refresh allowance, and receipt submission requirement."
+What notice period is required when an IC2 Software Engineer resigns?,factual,"According to the Employee Handbook, an IC2 Software Engineer falls within the IC1 - IC3 level range, which requires a **2 weeks notice period** for voluntary resignation.
+
+However, the handbook also notes that Orion may, at its discretion, accept shorter notice, place the employee on garden leave for the notice period, or waive the notice period entirely.",F:5/R:5,"The answer directly and accurately addresses the question by correctly identifying IC2 as falling within the IC1-IC3 range, citing the 2-week notice period from the handbook, and appropriately noting Orion's discretionary flexibility—all claims are fully supported by the retrieved context."
+How long is the probationary period for new employees at Orion?,factual,"According to the employee handbook, the probationary period for new regular employees at Orion is **90 days**, beginning on their first day of work.
+
+During this introductory period, employees have access to all standard benefits but may not participate in certain programs such as the annual promotion cycle or tuition reimbursement. It's important to note that completion of the introductory period does not change the at-will nature of employment.",F:5/R:5,"The answer is fully supported by the retrieved context and directly answers the question with accurate details about the 90-day introductory period, benefits access, and program restrictions."
+What is the phone number for Orion's Ethics Hotline?,factual,"The phone number for Orion's Ethics Hotline is **1-800-676-3844** (also written as 1-800-ORN-ETHI).
+
+You can also report concerns online at **oriontech.ethicspoint.com**.",F:5/R:5,The system answer is fully supported by the retrieved context and directly answers the question by providing both the phone number and the alternative online reporting method.
+What are Orion's core hours — when all employees must be available?,factual,"According to Orion's employee handbook, the core hours when all employees are expected to be available for meetings and collaboration are **10:00 AM to 3:00 PM in the employee's local time zone**.",F:5/R:5,The system answer directly quotes the core hours from the retrieved context and accurately addresses the question with all information grounded in the employee handbook.
+When is the annual performance bonus paid at Orion?,factual,"According to the employee handbook, the annual performance bonus at Orion is paid **once per year, in March**, based on performance in the prior calendar year.
+
+To be eligible for the bonus, you must meet these requirements:
+* Be actively employed on the date of payment
+* Have a minimum of three months of employment in the performance year
+* Have a performance rating of 'Meets Expectations' or above",F:5/R:5,"The answer directly addresses the question with accurate information from the context, providing the payment timing (March, once per year) and adding helpful eligibility criteria that enhance understanding without fabrication."
+How many paid holidays does Orion observe each year?,factual,"According to the employee handbook, Orion observes **12 company-wide paid holidays per year**.
+
+These holidays include: New Year's Day, Martin Luther King Jr. Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day, Thanksgiving Day, the Day after Thanksgiving, Christmas Eve, Christmas Day, and New Year's Eve.",F:5/R:5,"The answer directly and accurately addresses the question with all claims fully supported by the retrieved context, including the correct number of holidays and a complete list of them."
+How many paid days off does Orion provide for the death of a parent?,factual,"According to the Employee Handbook, Orion provides **5 paid days** of bereavement leave for the death of a parent, as a parent is considered immediate family.",F:5/R:5,"The answer directly and accurately cites the bereavement leave policy from the retrieved context, correctly identifying that a parent qualifies as immediate family entitled to 5 paid days off."
+How many therapy sessions per year does Orion's Employee Assistance Programme cover?,factual,"According to Orion's Employee Assistance Programme (EAP), employees have access to **up to 25 therapy or counselling sessions per year**. These services are provided through Lyra Health and are confidential and free of charge.",F:5/R:5,"The system answer accurately extracts and presents the specific information about therapy sessions from the retrieved context, and directly addresses the question asked with all supporting details."
+How much is the annual professional development budget per employee at Orion?,factual,"According to the Orion Technologies Employee Handbook, the annual professional development budget per employee is **$2,000 per year**.
+
+This budget can be used for approved purposes including:
+* Online courses (Coursera, Pluralsight, O'Reilly Learning, etc.)
+* Industry conferences and workshops (travel and registration covered separately up to $3,000)
+* Professional certifications (AWS, GCP, CKA, etc.) -- exam fees and one retake covered
+* Books, journals, and technical publications",F:5/R:4,"The answer is fully grounded in the retrieved context and directly addresses the question, but omits the detail about pre-approval requirements for requests over $200 that the reference answer includes."
+What is the maximum value of a gift an Orion employee can accept from a vendor?,factual,"According to the Gifts & Entertainment policy (Section 3.3), employees may accept gifts from vendors, customers, or business partners only when the gift has a fair market value of **USD $75 or less**.
+
+Gifts exceeding $75 in value must be declined or, if declining would cause offense, reported to the People team within five business days.
+
+Additionally, during procurement processes, no gifts of any value may be accepted from participating vendors.",F:5/R:4,"The system answer is fully supported by the retrieved context and directly answers the main question, but omits the important detail that cash and cash equivalents (gift cards, vouchers) can never be accepted regardless of value, which the reference answer explicitly includes."
+What is the minimum password length required by Orion's IT security policy?,factual,"According to Orion's Password & Authentication Policy (section 9.2), the minimum password length required is **16 characters**.",F:5/R:4,"The system answer is fully grounded in the retrieved context and directly answers the core question, but omits the reference detail about MFA being mandatory for all systems, which is contextually relevant to password security policy."
+Does Orion put money into my retirement savings account?,paraphrase,"Yes, Orion does contribute to your retirement savings through the 401(k) plan. Here are the details:
+
+**Employer Match:**
+- Orion matches **100% of your contributions up to 5% of your base salary**
+- This means if you contribute 5% of your salary, Orion will match that full amount
+
+**Vesting Schedule:**
+The employer match vests over 3 years:
+- 33% after year 1
+- 67% after year 2
+- 100% after year 3
+
+**Auto-Enrollment:**
+You're automatically enrolled at 6% of your salary, though you can adjust this rate or opt out at any time.
+
+You can also contribute up to the IRS annual limit ($23,000 for 2025; $30,500 if you're age 50 and above), though Orion's matching contribution is only on the first 5% of your salary.",F:5/R:5,"The answer is entirely grounded in the retrieved context and comprehensively addresses the question by explaining Orion's 401(k) match, vesting schedule, auto-enrollment details, and contribution limits."
+What budget do I get to set up my home office when I join Orion?,paraphrase,"When you join Orion as a full-time employee, you receive a **one-time home office setup stipend of $1,500**.
+
+Additionally, you'll receive an **annual equipment refresh allowance of $500 per year** for ongoing needs.
+
+Remember to submit receipts through Concur within 60 days of purchase to be reimbursed.",F:5/R:5,"The answer is fully grounded in the retrieved context and directly addresses the question by providing the specific budget amounts ($1,500 one-time, $500 annual) along with the submission requirement, matching the reference answer."
+When do I receive my yearly bonus at Orion?,paraphrase,"According to the employee handbook, Orion's annual performance bonus is paid **once per year, in March**, based on your performance in the prior calendar year.
+
+To be eligible for the bonus, you must meet these requirements:
+* Be actively employed on the date of payment
+* Have a minimum of three months of employment in the performance year
+* Have a performance rating of 'Meets Expectations' or above
+
+The bonus amount varies by level, ranging from a target of 10% to 30% of your base salary.",F:5/R:5,"The system answer directly addresses the question with accurate information from the retrieved context, including the payment timing (March), eligibility requirements, and bonus percentage ranges by level."
+When do my stock grants from Orion actually become mine to keep?,paraphrase,"Based on the employee handbook, Orion's standard vesting schedule for Restricted Stock Units (RSUs) is **4 years with a 1-year cliff**:
+
+* **25% vests after 12 months** (the cliff)
+* **1/48 per month for the remaining 36 months** (the rest vests gradually)
+
+This means that after your first year, 25% of your RSU grant becomes yours to keep. After that, the remaining 75% vests gradually each month over the next three years.
+
+RSU grants are subject to approval by the Board of Directors Compensation Committee, and tax withholding on vesting is handled automatically by Orion's equity administrator, Carta.",F:5/R:5,"The system answer is completely faithful to the retrieved context and directly addresses the user's question about when stock grants become theirs to keep, accurately explaining the 4-year vesting schedule with 1-year cliff and including all relevant details from the handbook."
+How do I report a concern about fraud at Orion without anyone knowing it was me?,paraphrase,"You can report fraud concerns anonymously through Orion's **Ethics Hotline**, which is operated by a third-party provider:
+
+**Ethics Hotline Contact Options:**
+- **Phone:** 1-800-ORN-ETHI (1-800-676-3844)
+- **Online:** oriontech.ethicspoint.com
+
+The anonymous reporting process allows you to raise concerns about fraud, ethics violations, financial misconduct, or other policy violations without revealing your identity.
+
+**Important protections:**
+- All reports are investigated by the Legal and People teams
+- **Retaliation is strictly prohibited** — you are protected from any adverse action for making a good-faith report
+- Retaliation itself is grounds for termination
+
+You do not need to confront the person involved before making a formal complaint through this channel.",F:5/R:5,The answer is fully grounded in the retrieved context and directly addresses the employee's question about anonymous fraud reporting with appropriate supporting details about protections and investigation procedures.
+Can Orion cover the cost of attending an industry conference?,paraphrase,"Yes, Orion can cover the cost of attending an industry conference. According to the Learning & Development section, industry conferences and workshops are approved uses of the $2,000 annual professional development budget per employee, with travel and registration covered separately up to $3,000.",F:5/R:4,"The answer is fully supported by the context and directly addresses the question, but omits the important detail that requests over $200 require pre-approval through the People Portal, which the reference answer includes."
+Do I have to use two-factor authentication to log into Orion systems?,paraphrase,"Yes. According to the Password & Authentication Policy (section 9.2), **Multi-Factor Authentication (MFA) is mandatory for all Orion systems, including email, GitHub, AWS, and the VPN.**",F:5/R:5,"The answer directly quotes the relevant policy section and accurately conveys that MFA is mandatory for all Orion systems, fully addressing the user's question with complete support from the retrieved context."
+"If a Senior Engineer (IC3) gives exactly 2 weeks notice when resigning, will they be eligible for rehire at Orion in the future?",multi-hop,"Based on the employee handbook, **no, they would not be eligible for rehire**.
+
+Here's why:
+
+According to Section 2.7 (Rehire Policy):
+- ""Employees who were terminated for cause or who resigned with less than two weeks' notice are designated as ineligible for rehire.""
+
+An IC3 (Senior Engineer) is required to give **4 weeks notice** according to Section 13.1. If they give exactly 2 weeks notice, that is **less than the required 4 weeks**, which makes them ineligible for rehire in the future.",F:1/R:1,"The system answer fundamentally misreads the handbook: it claims IC3 requires 4 weeks notice when the handbook explicitly states IC1-IC3 require 2 weeks, and it incorrectly concludes the employee is ineligible when giving exactly the required notice period makes them eligible for rehire."
+An employee joined Orion in October 2024 and received a Meets Expectations rating in the annual review. Will they receive a bonus in March 2025?,multi-hop,"Based on the information provided, **no, this employee will not receive a bonus in March 2025**.
+
+According to Section 5.4 (Annual Performance Bonus), eligibility requires:
+- Active employment on the date of payment ✓ (they will be)
+- **A minimum of three months of employment in the performance year** ✗ (they only have 2 months in 2024)
+- A performance rating of 'Meets Expectations' or above ✓ (they have this)
+
+Since the employee joined in October 2024, they will have only 2 months of employment in the 2024 performance year. The bonus is based on performance in the prior calendar year, and they do not meet the minimum three-month employment requirement for the 2024 performance year.",F:5/R:2,"The system answer correctly applies the bonus policy from the retrieved context but makes a critical arithmetic error: an October 2024 start date actually provides 3 months of employment in 2024 (October, November, December), not 2 months as claimed, leading to an incorrect conclusion that contradicts the reference answer."
+Does a part-time employee working 30 hours per week qualify for health insurance at Orion?,multi-hop,"Yes, a part-time employee working 30 hours per week qualifies for health insurance at Orion.
+
+According to the handbook, part-time employees working 20+ hours per week are eligible for pro-rated benefits. Since 30 hours per week meets this threshold, this employee would receive pro-rated health insurance benefits.
+
+Additionally, the handbook specifies that benefits eligibility begins on the first day of the month following the employee's hire date.",F:5/R:5,The system answer is fully grounded in the retrieved context and directly addresses the question with accurate information about part-time employee benefits eligibility and the effective date of benefits.
+An employee received a Developing rating (rating 2) in their annual review. Are they eligible for the performance bonus?,multi-hop,"Based on the provided handbook, **no, they are not eligible for the performance bonus**.
+
+According to Section 5.4 (Annual Performance Bonus), eligibility requires:
+- Active employment on the date of payment
+- A minimum of three months of employment in the performance year
+- **A performance rating of 'Meets Expectations' or above**
+
+A ""Developing"" rating (rating 2) does not meet the minimum threshold of ""Meets Expectations"" (rating 3), so the employee would not qualify for the annual performance bonus.",F:5/R:5,The answer is fully grounded in the retrieved context and directly answers the question with the correct conclusion and supporting rationale from Section 5.4.
+A Director gives 6 weeks notice when resigning. Are they eligible for rehire at Orion in the future?,multi-hop,"Based on the provided handbook, a Director who gives 6 weeks notice and resigns would be eligible for rehire in the future.
+
+According to Section 2.7 (Rehire Policy), former employees who left Orion ""in good standing (eligible for rehire)"" may be considered for open positions. Employees are designated as **ineligible for rehire** only if they were:
+1. Terminated for cause, OR
+2. Resigned with less than two weeks' notice
+
+Since the Director in your scenario provided 6 weeks notice (which exceeds the required 6-week notice period for Directors per Section 13.1), they would be considered to have left in good standing and would be eligible for rehire.",F:5/R:5,The answer is fully supported by the retrieved context (Section 2.7 Rehire Policy and Section 13.1 notice periods) and directly answers whether a Director giving 6 weeks notice is eligible for rehire.
+I want to work from Japan for 5 weeks while visiting family. What do I need to do before I go?,multi-hop,"Based on the handbook, since you want to work from Japan for more than 30 consecutive days, you need to:
+
+**Get prior written approval from:**
+* The People team
+* Legal
+
+**Important note:** The handbook states that ""Tax, immigration, and employment law implications vary significantly by country and must be assessed in advance.""
+
+You should contact the People team and Legal before your trip to ensure all requirements are met, as this is a mandatory approval process for any international remote work exceeding 30 consecutive days.",F:5/R:4,"The answer is fully grounded in the retrieved context and directly addresses the question; however, it omits the specific calculation that 5 weeks equals 35 days and exceeds the 30-day threshold, which the reference answer includes to clarify why the rule applies."
+An employee received a verbal warning last month. Are they still eligible for the annual performance bonus?,multi-hop,"Based on the provided handbook information, I don't know for certain. 
+
+The handbook states that to be eligible for the annual performance bonus, an employee must meet these requirements:
+* Be actively employed on the date of payment
+* Have a minimum of three months of employment in the performance year
+* Have a performance rating of 'Meets Expectations' or above
+
+A verbal warning alone is not explicitly listed as disqualifying an employee from bonus eligibility. However, the handbook does not clarify whether receiving a verbal warning affects the performance rating or eligibility status.
+
+I'd recommend contacting HR or the employee's manager for clarification on how the verbal warning impacts the employee's performance rating and bonus eligibility.",F:5/R:3,The system answer is fully grounded in the retrieved context but fails to definitively answer the question by unnecessarily deferring to HR when the handbook clearly states verbal warnings don't disqualify bonus eligibility.
+How do I request a pay raise before the annual review cycle?,out-of-scope,"I don't know based on the provided documents.
+
+The handbook outlines the annual review cycle in December where compensation decisions are made, and it describes the performance rating system and career progression framework. However, it does not contain information about the process for requesting a pay raise outside of the annual review cycle.
+
+I'd recommend reaching out to your manager or the People team directly to discuss your options for a mid-cycle compensation review.",F:5/R:5,"The system correctly refused to answer by explicitly stating the handbook lacks information on mid-cycle raises, acknowledged what the handbook does cover, and provided helpful guidance to consult appropriate resources."
+Does Orion have an office in London?,out-of-scope,"I don't know based on the provided documents.
+
+The handbook mentions that Orion has expanded to Europe and operates across twelve countries, but it does not specifically list which cities or countries have offices. To find out whether Orion has an office in London, you would need to contact the HR team at hr@oriontech.io or check the company's website at www.oriontech.io.",F:5/R:5,"The system correctly refused to answer by clearly stating the information is not in the handbook, accurately cited what the handbook does contain, and provided appropriate alternative resources without fabricating details about London."
+What is Orion's relocation package for new hires who need to move for the job?,out-of-scope,"I don't know based on the provided documents.
+
+The handbook excerpt provided does not contain information about Orion's relocation package for new hires. While the document covers remote work policies, home office stipends, and other benefits, it does not address relocation assistance or moving expenses.
+
+I'd recommend contacting the People team directly for details about relocation support.",F:5/R:5,"System correctly refused to answer, explicitly stated the topic is not covered in the handbook, acknowledged the question directly, and provided appropriate escalation guidance."
+Am I allowed to bring my dog to the Orion office?,out-of-scope,"I don't know based on the provided documents. The employee handbook sections provided do not contain information about pets or animals in the office.
+
+For this question, I'd recommend contacting your manager or the People team directly.",F:5/R:5,"The system correctly refused to answer by explicitly stating the topic is not covered in the handbook, acknowledged the specific question about dogs at the Orion office, and provided helpful guidance to contact appropriate resources."
+How do I apply for a different role within Orion without going through external recruiting?,out-of-scope,"I don't know based on the provided documents.
+
+The handbook excerpt provided does not contain information about internal job transfer or promotion procedures. To find out how to apply for a different role within Orion, I recommend:
+
+1. Contacting your People team directly at **hr@oriontech.io** or **+1 (512) 400-7200**
+2. Checking the **Orion People Portal** at **people.oriontech.io** for internal job postings and application procedures
+
+They'll be able to guide you through the internal mobility process.",F:5/R:5,"System correctly refused to answer from handbook, clearly stated the limitation, acknowledged the specific question asked, and provided helpful alternative resources (HR contact and internal portal) without fabricating policy details."
+How do I sign up for the OrionCare mental wellness programme?,fictitious-entity,"I don't know based on the provided documents.
+
+The handbook mentions an Employee Assistance Programme (EAP) provided through Lyra Health that offers therapy, counselling, and other support services, but there is no information about an ""OrionCare mental wellness programme"" or how to sign up for it in the sections provided.
+
+If you're looking for mental health support, I can tell you that the EAP services are available to all employees and their household members at no charge, with a 24/7 crisis line at 1-800-ORN-LYRA. For specific details about OrionCare or enrollment procedures, I'd recommend contacting your People team directly.",F:5/R:5,"System correctly refused to answer the out-of-scope question about OrionCare, clearly distinguished it from the EAP program that is documented, and provided helpful guidance on finding accurate information."
+What discounts can I get with the Orion Gold Card employee programme?,fictitious-entity,"I don't know based on the provided documents.
+
+The employee handbook excerpt provided does not contain any information about an ""Orion Gold Card employee programme"" or associated discounts. If you're looking for information about employee discounts or benefits programs, I'd recommend contacting the People team directly for details.",F:5/R:5,The system correctly refused to answer by explicitly stating the topic is not in the provided documents and appropriately redirected the user to a helpful resource (People team) without fabricating any information.
+How do I submit a medical claim through the OrionHealth portal?,fictitious-entity,"I don't know based on the provided documents.
+
+The handbook mentions that benefit details are available on the People Portal at people.oriontech.io, but it does not contain specific instructions on how to submit medical claims or information about an ""OrionHealth portal."" 
+
+For guidance on submitting medical claims, I recommend visiting the People Portal or contacting your HR department directly.",F:5/R:5,"The system correctly refused to answer by clearly distinguishing between what the handbook covers (People Portal location) and what it doesn't (OrionHealth portal procedures), then provided appropriate alternative guidance."
+How do I apply for the Orion Innovation Lab stipend to fund a side project?,fictitious-entity,"I don't know based on the provided documents.
+
+The employee handbook section provided does not contain information about an ""Orion Innovation Lab stipend"" or how to apply for funding for side projects. 
+
+If you're looking for information about professional development funding, the handbook does mention that Orion invests $2,000 per employee per year in professional development for things like online courses, conferences, certifications, and technical publications. For details about the Innovation Lab stipend specifically, I'd recommend contacting your People team or manager directly.",F:5/R:5,"The system correctly refused to answer by clearly stating the specific topic is not in the handbook, then helpfully pivoted to related information that IS documented (professional development budget) and suggested appropriate contact channels."
+Is there any flexibility in the notice period if I want to leave sooner than expected?,adversarial,"Yes, there is flexibility in the notice period. According to the handbook, while the expected notice periods by level are:
+
+- **IC1 - IC3:** 2 weeks
+- **IC4 - IC5 / Manager:** 4 weeks
+- **Director and above:** 6 weeks
+
+**Orion may, at its discretion:**
+- Accept shorter notice
+- Place you on garden leave for the notice period
+- Waive the notice period entirely
+
+So if you need to leave sooner, you should discuss this with your manager and the People team. They have the authority to accommodate a shorter departure timeline depending on your circumstances.",F:1/R:4,"System confidently provided specific details about notice period flexibility as if from the handbook, but this was marked as intentionally out of scope—a critical hallucination failure."
+Can I use my home office stipend to buy the laptop I need to work from home?,adversarial,"Based on the handbook, the home office stipend can be used for home office setup expenses, but **laptops are specifically excluded**.
+
+Here's why: The handbook states that ""Laptops and other Orion-owned equipment remain company property and must be returned upon termination."" This indicates that laptops are provided by Orion as company equipment, not purchased by employees.
+
+Your home office stipend of $1,500 (one-time upon joining) and $500 annual equipment refresh allowance are intended for other home office setup needs. You should contact your manager or the People team to request a company laptop if you don't already have one.",F:1/R:4,"System fabricated specific handbook quotes and policy details (stipend amounts, exclusion language) that were not verified as being in the actual knowledge base, presenting invented information as fact."
+"Since Orion has a flexible PTO policy with no cap, can I take as many days as I want without asking my manager?",adversarial,"No, that's not correct. While Orion does have a flexible PTO policy for full-time exempt employees with no preset cap on PTO days, there are still important requirements:
+
+1. **Manager Approval Required**: PTO must be scheduled with manager approval, taking into account business needs and team coverage.
+
+2. **Minimum Time Off Expected**: Employees are expected to take at least 15 days off per year and are encouraged to take 20-25 days.
+
+So while there's no maximum limit, you still need to get your manager's approval before taking time off, and the approval will consider business needs and team coverage. The flexibility doesn't mean you can take unlimited time without coordination.",F:1/R:4,"System confidently provided specific details (15 days minimum, 20-25 days encouraged, manager approval required) as fact without indicating these came from the handbook or acknowledging uncertainty, constituting a critical hallucination failure."
+I have been genuinely unwell and missed 6 unplanned days in the past 90 days. Will I face disciplinary action?,adversarial,"Based on the handbook, excessive unplanned absences are defined as **more than 5 unscheduled days within any rolling 90-day period, excluding approved leave**.
+
+Since you have missed 6 unplanned days in the past 90 days, this exceeds the threshold and would be considered excessive. According to the policy:
+
+> ""Excessive unplanned absences (more than 5 unscheduled days within any rolling 90-day period, excluding approved leave) will be addressed through the performance management process described in Section 12.""
+
+This means your absences would likely be addressed through the **progressive discipline process** outlined in Section 12.1, which typically starts with a verbal warning.
+
+**However**, an important consideration: if these absences were due to your own illness and you have proper documentation (such as a doctor's note), they may qualify as **sick leave** rather than unscheduled absences. The handbook notes that for absences of 5 or more consecutive days, a doctor's note is required.
+
+I recommend:
+1. Documenting your illness with medical records
+2. Logging these absences in WorkDay as sick leave (within 24 hours if not already done)
+3. Speaking with your manager or the People team to clarify how these days will be classified",F:1/R:2,"The system confidently fabricated a specific policy (>5 days threshold, progressive discipline in Section 12.1) with direct quotes, presenting invented handbook content as fact rather than acknowledging the question is outside its knowledge base."

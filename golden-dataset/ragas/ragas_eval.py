@@ -2,9 +2,10 @@
 Score evaluation results with RAGAS metrics.
 
 What this script does:
-  Reads a completed run CSV (from run_evaluation.py + score_results.py),
-  runs the four standard RAGAS metrics against the in-scope rows,
-  and saves per-row scores plus a summary.
+  Reads a completed run CSV (from run_evaluation.py) — read-only, this script
+  never modifies golden-dataset/runs/run-001.csv. Runs the four standard RAGAS
+  metrics against the in-scope rows and saves its own per-row scores plus a
+  summary into golden-dataset/ragas/results/.
 
 The four metrics:
   Faithfulness      — are all claims in the answer supported by the retrieved context?
@@ -17,20 +18,21 @@ The four metrics:
                       Catches missed chunks.
 
 LLM judge and embeddings:
-  This script uses Claude (via ANTHROPIC_API_KEY — the same key as score_results.py)
-  as the RAGAS judge, and a free local sentence-transformers model for the
-  embedding-based Answer Relevancy metric. No OpenAI key or spend required.
+  This script uses Claude (via ANTHROPIC_API_KEY — the same key as
+  gptscore/score_gptscore.py) as the RAGAS judge, and a free local
+  sentence-transformers model for the embedding-based Answer Relevancy metric.
+  No OpenAI key or spend required.
 
 Prerequisites:
   python3.11 -m pip install ragas sentence-transformers anthropic
 
 Setup:
-  Add ANTHROPIC_API_KEY=sk-ant-... to your .env file (same key used by score_results.py).
+  Add ANTHROPIC_API_KEY=sk-ant-... to your .env file (repo root).
 
 Usage:
-  python3.11 golden-dataset/ragas_eval.py                        # scores runs/run-001.csv
-  python3.11 golden-dataset/ragas_eval.py runs/run-002.csv       # scores a different file
-  python3.11 golden-dataset/ragas_eval.py --metrics faith,rel    # subset of metrics
+  python3.11 golden-dataset/ragas/ragas_eval.py                        # scores runs/run-001.csv
+  python3.11 golden-dataset/ragas/ragas_eval.py runs/run-002.csv       # scores a different file
+  python3.11 golden-dataset/ragas/ragas_eval.py --metrics=faith,rel    # subset of metrics
 
 Metric shortcodes:
   faith   = Faithfulness
@@ -40,8 +42,8 @@ Metric shortcodes:
   (default: all four)
 
 Output:
-  golden-dataset/runs/ragas-scores.csv   — per-row RAGAS scores
-  golden-dataset/runs/ragas-summary.md   — averages by query type
+  golden-dataset/ragas/results/run-001-scores.csv   — per-row RAGAS scores
+  golden-dataset/ragas/results/summary.md           — averages by query type
 
 Notes on cost:
   The Claude judge calls cost a small amount per row per metric (Haiku pricing).
@@ -55,7 +57,7 @@ import os
 import sys
 
 # --------------------------------------------------------------------------
-# Argument parsing
+# Paths — run from the repo root: python3.11 golden-dataset/ragas/ragas_eval.py
 # --------------------------------------------------------------------------
 args = sys.argv[1:]
 METRIC_FILTER = None
@@ -67,15 +69,17 @@ for a in args:
         INPUT_FILE_ARG = a
 
 INPUT_FILE = INPUT_FILE_ARG or "golden-dataset/runs/run-001.csv"
-OUTPUT_SCORES = os.path.join(os.path.dirname(INPUT_FILE), "ragas-scores.csv")
-OUTPUT_SUMMARY = os.path.join(os.path.dirname(INPUT_FILE), "ragas-summary.md")
+OUTPUT_DIR = "golden-dataset/ragas/results"
+OUTPUT_SCORES = os.path.join(OUTPUT_DIR, "run-001-scores.csv")
+OUTPUT_SUMMARY = os.path.join(OUTPUT_DIR, "summary.md")
 
 # --------------------------------------------------------------------------
-# Load .env
+# Load .env from the repo root (this script lives two levels down, in golden-dataset/ragas/)
 # --------------------------------------------------------------------------
 def load_dotenv(path=".env"):
     here = os.path.dirname(os.path.abspath(globals().get("__file__", "")))
-    repo_root_env = os.path.join(os.path.dirname(here), path)
+    repo_root = os.path.dirname(os.path.dirname(here))
+    repo_root_env = os.path.join(repo_root, path)
     for candidate in (path, repo_root_env):
         if not os.path.exists(candidate):
             continue
@@ -134,7 +138,7 @@ ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 if not ANTHROPIC_KEY or "your-key" in ANTHROPIC_KEY:
     sys.exit(
         "ANTHROPIC_API_KEY not set.\n"
-        "This script uses Claude as the RAGAS judge (same key as score_results.py).\n"
+        "This script uses Claude as the RAGAS judge (same key as gptscore/score_gptscore.py).\n"
         "Add ANTHROPIC_API_KEY=sk-ant-... to your .env file and re-run."
     )
 
@@ -289,6 +293,8 @@ def main():
             f"File not found: {INPUT_FILE}\n"
             "Run run_evaluation.py first to generate results."
         )
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     with open(INPUT_FILE, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)

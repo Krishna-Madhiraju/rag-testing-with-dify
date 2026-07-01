@@ -1,20 +1,18 @@
-# Evaluation Scores
+# GPTScore (Claude as Judge) Scores
 
 Input file: golden-dataset/runs/run-001.csv
 
 Total rows: 60 (40 in-scope, 20 out-of-scope/adversarial)
 
 
-## Generation Scores (in-scope rows)
+## Averages (in-scope rows)
 
-Average BLEU:            0.181
-Average ROUGE-L:         0.432
 GPTScore Faithfulness:   4.88 / 5
 GPTScore Relevance:      4.47 / 5
 
 ## Hallucination Rate (out-of-scope + fictitious-entity + adversarial rows)
 
-Rows where system hallucinated (GPTScore faithfulness ≤ 2): 6/20
+Rows where system hallucinated (GPTScore faithfulness <= 2): 6/20
 
 ## Per-row GPTScore breakdown
 
