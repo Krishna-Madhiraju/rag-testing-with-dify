@@ -62,6 +62,9 @@ rag-demo/
 │   │   └── glossary.md                  # RAG terminology reference
 │   ├── setup/
 │   │   └── dify-setup.md                # Step-by-step Dify configuration guide
+│   ├── reference/
+│   │   ├── llm-api-cost-comparison.md          # Frontier vs. open-source-serving LLM API pricing, free tiers, Dify compatibility
+│   │   └── embedding-model-pricing-comparison.md  # Embedding API cost, dimensions, and quality comparison
 │   ├── testing/
 │   │   ├── test-strategy.md                  # One-page test strategy for the RAG pipeline
 │   │   ├── rag-evaluation-playbook.md        # How to execute evaluation — metrics, A/B testing
@@ -225,6 +228,8 @@ A suggested reading order — concepts first, then set up, then test:
 
 **2 · Set up the pipeline**
 - [Dify Setup Guide](docs/setup/dify-setup.md) — step-by-step Dify configuration
+- [LLM API Cost Comparison](docs/reference/llm-api-cost-comparison.md) — frontier vs. open-source-serving providers, pricing, free tiers, and Dify plugin compatibility (useful if you hit Gemini's free-tier rate limits)
+- [Embedding Model API Comparison](docs/reference/embedding-model-pricing-comparison.md) — embedding API cost, dimensions, and quality across providers
 
 **3 · Test it — must-read**
 - [Why RAG Testing Is Harder Than Normal API Testing](docs/testing/rag-vs-api-testing.md) — read this first: three properties that break standard test assumptions; the three-layer testing strategy
