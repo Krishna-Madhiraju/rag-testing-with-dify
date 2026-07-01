@@ -2,7 +2,20 @@
 
 A configuration comparison is an experiment: you change one thing, measure the impact on your golden dataset, and decide whether the change is an improvement. Done well, it gives you evidence for a decision. Done poorly, it gives you numbers that feel like evidence but are not.
 
-This document explains how to design the experiment, read the results, and make a defensible decision.
+This document explains how to design the experiment, read the results, and make a defensible decision. This is what the glossary calls **A/B Configuration Testing** — the term and this document describe the same thing.
+
+---
+
+## The Short Version: Who, What, When, Where, Why, How
+
+| Question | Answer |
+|---|---|
+| **What** | Change exactly one RAG configuration setting, run the same golden dataset through both versions, and compare evaluation scores — not impressions — to decide which is better. |
+| **Why** | A config change shipped on a hunch ("bigger chunks feel like they'd help") can silently regress something you weren't watching. A/B testing turns "I think this helps" into "multi-hop Recall@K moved from 0.42 to 0.68 while Faithfulness held at 0.90" — a claim a reviewer can check. |
+| **Who** | The tester (or whoever owns retrieval quality) designs and runs the experiment. Declaring the winner is usually theirs too — except when there's a genuine trade-off with no clean winner (see [The Trade-Off Decision](#the-trade-off-decision)), which is a product/priority call and needs whoever owns that call in the room. |
+| **When** | Before shipping any change to chunk size/overlap/strategy, embedding model, Top K, Score Threshold, Hybrid Search, Rerank Setting, LLM model, temperature, or system prompt. Also run one reactively when a finding demands it — e.g. `golden-dataset/findings.md` shows Context Precision at 0.624 against a Faithfulness of 0.906; that gap is itself the hypothesis for "try a smaller chunk size or a Rerank Model and see if precision recovers." |
+| **Where** | Locally, against your own Dify Knowledge Base and Weaviate index. Never A/B test against a shared or production knowledge base — re-indexing for Config B disturbs anyone else querying it mid-experiment. |
+| **How** | One variable, same golden dataset, same session, read the breakdown by query type before you look at the overall average. Full mechanics below. |
 
 ---
 
@@ -13,10 +26,44 @@ A RAG configuration is the complete set of settings that define how the pipeline
 | Layer | Examples of what can change |
 |---|---|
 | Ingestion | Chunk size, chunk overlap, chunking strategy |
-| Retrieval | Embedding model, top-K value, retrieval mode (dense vs hybrid), re-ranking on/off |
+| Retrieval | Embedding model, Top K, Score Threshold, retrieval mode (Vector Search vs Hybrid Search), Rerank Setting |
 | Generation | LLM model, system prompt wording, temperature |
 
 Changing any one of these changes the configuration. A comparison is only meaningful when exactly one thing changes between the two runs.
+
+---
+
+## Parameters You Can A/B Test — the Full Catalog
+
+Organized by the same three layers as the table above. Ingestion-layer changes require a full re-index; retrieval- and generation-layer changes usually don't (they're settings on the Knowledge Base / Retrieval Settings panel and the Orchestrate tab, respectively).
+
+### Ingestion layer (requires a re-index)
+
+| Parameter | Mechanism — why it changes results | Values to try | Expected effect | Regression risk |
+|---|---|---|---|---|
+| Chunk size (Maximum chunk length) | Bigger chunks carry more surrounding context per embedding but dilute the vector's semantic focus; smaller chunks embed a tighter concept but may split an answer across a boundary | 500 / 1,000 / 1,500 / 2,000 characters | Larger → better Recall@K on multi-hop and context-completeness questions. Smaller → better Context Precision | Too small: boundary questions fail (the answer straddles two chunks, neither retrieves cleanly). Too large: Context Precision and Faithfulness drop — more irrelevant text rides along in every retrieved chunk |
+| Chunk overlap | Repeating tokens between neighbouring chunks so a fact sitting on a chunk boundary appears whole in at least one chunk | 0% / 10–15% / 25% of chunk size | Higher overlap → better Recall@K specifically on paraphrase and boundary rows | Index size and embedding cost grow with overlap; too much creates near-duplicate chunks that can crowd genuinely different content out of the top-K |
+| Chunking strategy | How boundaries are chosen: fixed character count vs. sentence/paragraph-aware splits vs. parent-child (small-to-big) dual indexing | Compare fixed-size vs. Dify's Parent-Child Chunking at similar sizes | Parent-child typically improves both precision (child chunk matches) and completeness (parent chunk returned) at once — see [Chunking Strategies § Parent-Child](chunking-strategies.md#parent-child-chunking-advanced) | Parent-child doubles storage and re-indexing time. Don't change size and strategy in the same run — pick one |
+
+### Retrieval layer (re-index not required)
+
+| Parameter | Mechanism | Values to try | Expected effect | Regression risk |
+|---|---|---|---|---|
+| Embedding model | Defines the vector coordinate system; every chunk must be re-embedded, and old and new vectors aren't comparable | Compare 2–3 candidates from [Embedding Model Pricing Comparison](../reference/embedding-model-pricing-comparison.md) | Recall@K shifts across all query types, most visibly on paraphrase rows (domain vocabulary fit) | Full re-index required — the most expensive single experiment on this list. Batch it last, once cheaper retrieval settings are already tuned |
+| Top K | Number of chunks retrieved per query and handed to the LLM | 3 / 5 / 8 / 10 (Dify default is 3–4) | Higher K → better Context Recall (the right chunk is more likely to be somewhere in the set) | Higher K → lower Context Precision (more noise) and rising token cost; a very high K risks the "lost in the middle" effect, where the LLM under-weights chunks placed mid-context |
+| Score Threshold | Minimum similarity score a chunk must clear to be returned at all, independent of Top K | Off (Dify default) vs. a fixed cutoff, e.g. 0.75 | A well-tuned threshold can improve Context Precision by dropping low-relevance chunks before they reach the LLM | Too strict a threshold silently returns zero chunks on a valid but loosely-phrased question — reads to a user as a false refusal. Keep it off while you're still learning what a "good" score looks like for your data |
+| Retrieval mode: Vector Search vs. Hybrid Search | Vector Search is dense/semantic only; Hybrid Search runs dense + full-text (keyword) search simultaneously and re-ranks the combined results | Vector Search (baseline) vs. Hybrid Search | Hybrid typically helps queries with exact terms — policy section numbers, named roles, dates — that an embedding can blur | Hybrid Search always re-ranks, so switching to it also changes the Rerank Setting at the same time. Treat "Vector → Hybrid" as one combined variable, not two |
+| Rerank Setting: Weighted Score vs. Rerank Model | A second pass re-scores the initial candidates — Weighted Score reuses the similarity scores already computed at no extra cost; a Rerank Model runs a cross-encoder that reads query + chunk together for a more accurate score | Weighted Score (no extra model) vs. a Rerank Model if one is installed | Improves Context Precision by pushing borderline-relevant chunks out of the final Top K, without touching the index | Adds latency per query; if the rerank model is a poor domain fit it can occasionally demote a genuinely good chunk — spot-check the retrieval inspector after enabling it |
+
+### Generation layer (re-index not required)
+
+| Parameter | Mechanism | Values to try | Expected effect | Regression risk |
+|---|---|---|---|---|
+| LLM model | Only the generation step changes; retrieval is untouched | Model A vs. Model B, same system prompt | Faithfulness and Answer Relevancy shift; per `findings.md`, weaker models are more likely to fabricate on adversarially-framed questions where a stronger model refuses | Context Recall and Context Precision should **not** move — if they do, something besides the LLM also changed, and the comparison is confounded |
+| Temperature | Controls sampling randomness during generation — 0 is near-deterministic, higher values increase wording variety | 0 vs. 0.3 vs. 0.7 | Higher temperature increases lexical variety (lowers BLEU/ROUGE, which reward exact phrasing) without necessarily changing correctness | At temperature 0, re-running the same question should give near-identical answers. If it doesn't, the variance is likely coming from HNSW's *approximate* search returning slightly different chunks between runs, not from the LLM — check retrieval before blaming generation |
+| System prompt wording | The instructions that tell the model how to use retrieved context and when to refuse | Baseline prompt vs. one with an explicit "only answer from the provided context; if it's not there, say so" instruction | Directly targets out-of-scope refusal rate and the false-premise adversarial failure mode ([Adversarial Testing § Failure Mode 2](adversarial-testing.md)) | An overly strict refusal instruction can increase false refusals on legitimate in-scope questions — watch Answer Relevancy on factual rows, not just the adversarial ones, after this change |
+
+Every generation-layer change should leave Context Recall and Context Precision unchanged, since retrieval wasn't touched. If those metrics move too, treat it as a signal the comparison isn't actually isolated to one variable — see the scorecard table below.
 
 ---
 
@@ -154,19 +201,20 @@ There is no universal answer. The decision depends on which failure mode causes 
 
 ---
 
-## Common Traps
+## Do's and Don'ts
 
-**Comparing to a stale baseline.** Run both configurations in the same session. Never compare today's experiment to last week's run.
-
-**Changing two things at once.** If you change chunk size and switch to a different embedding model in the same re-index, any result is unattributable. Roll back to one variable.
-
-**Reading only the average.** Always break down by query type. Averages hide the trade-offs that determine whether the change is right for your use case.
-
-**Calling a noise-level difference a win.** A 2-point improvement on a 60-row dataset is not evidence. Resist shipping every marginal gain. Stability has value.
-
-**Ignoring regressions in metrics you were not watching.** Define your full scorecard before running the experiment. If you only look at the metric you hoped to improve, you will miss regressions in the ones you did not check.
-
-**Not documenting what you found.** The value of a comparison is not just the decision — it is the institutional knowledge that "we tried 300 chars and it broke multi-hop." Document every experiment result, including the ones where no meaningful difference was found. Negative results prevent you from running the same experiment again in six months.
+| Do | Don't |
+|---|---|
+| Run both configurations back-to-back in the same session, against the same golden dataset | Compare today's experiment to a run from last week or a previous session |
+| Change exactly one setting per run | Change chunk size and switch embedding models in the same re-index — any result becomes unattributable |
+| Decide your scorecard and "meaningful difference" thresholds *before* running the experiment | Decide, after seeing the numbers, which metrics matter and how big a change counts as real |
+| Break results down by query type before reading the overall average | Stop at the overall average — it hides trade-offs like a 26-point multi-hop gain offset by a precision drop elsewhere |
+| Apply the "under 3% is noise" rule (see [What Counts as a Meaningful Difference](#what-counts-as-a-meaningful-difference)) before calling a winner | Ship a config change because it scored 2 points higher, without checking whether that's inside the noise band |
+| Define the full scorecard up front, including metrics you don't expect to move | Only look at the metric you hoped would improve, and miss a regression in one you didn't check |
+| Re-check the out-of-scope and adversarial rows on every run, even when they weren't the target of the change | Assume adversarial/out-of-scope behaviour is unaffected just because the change was retrieval-only |
+| Treat a genuine trade-off (Config A precision-favoured, Config B recall-favoured) as a product decision | Pick whichever configuration has the higher blended average when the two are actually trading off different failure modes |
+| Batch expensive experiments (embedding model swaps, full re-indexes) last, after cheap settings are tuned | Re-embed the whole knowledge base repeatedly while still exploring cheap settings like Top K or Score Threshold |
+| Document every result, including "no meaningful difference — kept current config" | Only write up the experiments that produced a clear winner — negative results are what stop the team re-running the same experiment in six months |
 
 ---
 
@@ -196,5 +244,9 @@ Step 10 is where most teams stop short. A well-documented experiment — even a 
 - [RAG Evaluation Playbook](rag-evaluation-playbook.md) — how to execute evaluation runs and interpret metrics across a dataset
 - [Chunking Strategies](chunking-strategies.md) — how chunk size, overlap, and strategy affect specific metric categories; the failure mode map
 - [RAGAS Evaluation Metrics](ragas-evaluation-metrics.md) — Faithfulness, Answer Relevancy, Context Precision, Context Recall in detail
+- [Adversarial Testing](adversarial-testing.md) — the false-premise failure mode a system-prompt A/B test targets
+- [Embedding Model Pricing Comparison](../reference/embedding-model-pricing-comparison.md) — candidates to compare in an embedding-model A/B test
 - [Golden Dataset Guide](../../golden-dataset/guide.md) — the dataset that anchors every comparison run
+- [Golden Dataset Cross-Metric Findings](../../golden-dataset/findings.md) — a real run whose Context Precision/Faithfulness gap is a worked example of a finding that should trigger an A/B test
+- [RAG Terminology Glossary](../concepts/glossary.md) — definitions for Score Threshold, Hybrid Search, Rerank Setting, and A/B Configuration Testing
 - [Test Strategy](test-strategy.md) — when to run A/B experiments in the release cadence
