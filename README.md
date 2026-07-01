@@ -154,7 +154,7 @@ Summary of the one-time setup:
 4. Create a **Knowledge Base**, upload the test document from `docs/sample-data/`, and configure chunking
 5. Build a **Chatbot** app, attach the Knowledge Base, and publish it
 
-**Provider recommendation:** OpenAI `gpt-4o-mini` + `text-embedding-3-small` is cheap (~$0.10/session) and well-supported. [Ollama](https://ollama.com) is free and runs entirely locally if you prefer no API costs.
+**Provider recommendation:** OpenAI `gpt-5.4-nano` + `text-embedding-3-small` is cheap and well-supported — see [LLM API Cost Comparison](docs/reference/llm-api-cost-comparison.md) for current pricing. [Ollama](https://ollama.com) is free and runs entirely locally if you prefer no API costs.
 
 ---
 
@@ -242,7 +242,7 @@ A suggested reading order — concepts first, then set up, then test:
 **3 · Test it — must-read**
 - [Why RAG Testing Is Harder Than Normal API Testing](docs/testing/rag-vs-api-testing.md) — read this first: three properties that break standard test assumptions; the three-layer testing strategy
 - [Test Strategy](docs/testing/test-strategy.md) — scope, risk areas, test types, cadence, and release gates
-- [Functional Test Scenarios](docs/testing/functional-test-scenarios.md) — 74 test cases across 12 categories (in-scope, paraphrase, adversarial, multi-hop, multi-turn, tone, and more)
+- [Functional Test Scenarios](docs/testing/functional-test-scenarios.md) — 89 test cases across 15 categories (in-scope, paraphrase, adversarial, multi-hop, multi-turn, tone, safety/HAF, prompt injection, conflicting documents, and more)
 - [RAG Evaluation Playbook](docs/testing/rag-evaluation-playbook.md) — how to execute evaluation: retrieval metrics, generation scoring, A/B testing
 - [RAGAS Evaluation Metrics](docs/testing/ragas-evaluation-metrics.md) — Faithfulness, Answer Relevancy, Context Precision, Context Recall: how each works, what it catches, when to use it
 - [Adversarial Testing](docs/testing/adversarial-testing.md) — five failure modes (hallucination, false premise, prompt injection, document injection, conflicting docs); how to write cases and classify severity

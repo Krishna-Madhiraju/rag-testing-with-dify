@@ -21,9 +21,9 @@ This is Approach 3 from the [Golden Dataset Guide](../../golden-dataset/guide.md
 
 RAGAS is built around three components that you configure and wire together:
 
-**Generator LLM** — creates the questions and answers. This is typically a faster, cheaper model (e.g. `gpt-4o-mini`). It reads each chunk of your document and produces candidate Q&A pairs.
+**Generator LLM** — creates the questions and answers. This is typically a faster, cheaper model (e.g. `gpt-5.4-nano`). It reads each chunk of your document and produces candidate Q&A pairs.
 
-**Critic LLM** — reviews what the generator produced and scores it for quality. This is a more capable model (e.g. `gpt-4o`). It asks: is this question realistic? Is the answer grounded in the passage? Is it too trivially easy? Pairs that score below threshold are dropped before you ever see them. This is the key advantage over a custom script — automatic quality filtering without writing filter code.
+**Critic LLM** — reviews what the generator produced and scores it for quality. This is a more capable model (e.g. `gpt-5.4`). It asks: is this question realistic? Is the answer grounded in the passage? Is it too trivially easy? Pairs that score below threshold are dropped before you ever see them. This is the key advantage over a custom script — automatic quality filtering without writing filter code.
 
 **Embeddings model** — maps semantic relationships between passages across your document. RAGAS needs this to build multi-hop questions: it identifies two passages that are related but not adjacent, then writes a question requiring both. Without it, RAGAS can only generate single-passage questions.
 
@@ -122,7 +122,7 @@ Recommended pairing:
 
 | Component | Recommended model | Why |
 |---|---|---|
-| LLM | `gpt-4o-mini` | Cheap, fast, sufficient quality for generation |
+| LLM | `gpt-5.4-nano` | Cheap, fast, sufficient quality for generation |
 | Embeddings | `text-embedding-3-small` | Matches Dify's default — keeps chunk representations consistent |
 
 If you want zero API cost, Ollama models work but generation quality and speed drop significantly.

@@ -164,7 +164,7 @@ from ragas.llms import LangchainLLMWrapper
 from langchain_openai import ChatOpenAI
 
 # The judge model that does the scoring
-judge = LangchainLLMWrapper(ChatOpenAI(model="gpt-4o-mini"))
+judge = LangchainLLMWrapper(ChatOpenAI(model="gpt-5.4-nano"))
 
 sample = SingleTurnSample(
     user_input="What is the refund window?",

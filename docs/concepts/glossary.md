@@ -12,7 +12,7 @@ A reference guide to every term you will encounter when building, running, and t
 A technique that gives a Large Language Model access to external documents at query time. Instead of relying solely on what the model learned during training, RAG retrieves relevant chunks of your own data and passes them to the LLM as context before generating an answer. The three steps are: Index → Retrieve → Generate.
 
 **LLM (Large Language Model)**
-The AI model responsible for generating the final answer (e.g. Gemini 2.5 Flash, GPT-4o, Claude). In a RAG pipeline, the LLM receives the user's question plus the retrieved chunks and produces a response. The LLM does not search — that is the retrieval layer's job.
+The AI model responsible for generating the final answer (e.g. Gemini 3.5 Flash, GPT-5.4, Claude Sonnet 5). In a RAG pipeline, the LLM receives the user's question plus the retrieved chunks and produces a response. The LLM does not search — that is the retrieval layer's job.
 
 **Context Window**
 The maximum amount of text (measured in tokens) an LLM can process in a single request. Retrieved chunks must fit within the context window alongside the system prompt and the user's question. If too many chunks are retrieved, the context window overflows and some content is dropped.

@@ -193,7 +193,7 @@ Results land in `golden-dataset/ragas/results/run-001-scores.csv` with a summary
 
 ## Cost Note
 
-RAGAS makes one or more LLM API calls per sample per metric. With 21 rows and four metrics, expect roughly $0.02–$0.05 on `gpt-4o-mini`. Context Precision and Context Recall skip out-of-scope and fictitious-entity rows (no reference answer to compare against).
+RAGAS makes one or more LLM API calls per sample per metric. With 21 rows and four metrics, expect roughly $0.02–$0.05 on `gpt-5.4-nano`. Context Precision and Context Recall skip out-of-scope and fictitious-entity rows (no reference answer to compare against).
 
 ---
 

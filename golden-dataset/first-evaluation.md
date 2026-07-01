@@ -436,7 +436,7 @@ Configuration:
   - Chunk overlap: 50 characters
   - Top-K: 3
   - Embedding model: text-embedding-3-small
-  - LLM: gpt-4o-mini
+  - LLM: gpt-5.4-nano
   - System prompt version: v1
 
 Dataset: 60 rows (20 factual, 10 paraphrase, 10 multi-hop, 8 out-of-scope, 6 fictitious entity, 6 adversarial)
