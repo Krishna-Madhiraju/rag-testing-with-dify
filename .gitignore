@@ -10,3 +10,6 @@ dify/
 
 # macOS
 .DS_Store
+
+# LinkedIn post drafts — personal, not repo content
+linkedin-posts/
