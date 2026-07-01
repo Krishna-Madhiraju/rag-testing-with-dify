@@ -1,5 +1,10 @@
 # RAG Application Testing with Dify
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Built with Dify](https://img.shields.io/badge/Built%20with-Dify-5551ff)](https://github.com/langgenius/dify)
+[![Vector Store: Weaviate](https://img.shields.io/badge/Vector%20Store-Weaviate-00c8a3)](https://weaviate.io)
+[![Evaluated with RAGAS](https://img.shields.io/badge/Evaluated%20with-RAGAS-orange)](https://docs.ragas.io)
+
 A hands-on learning project for building and testing **Retrieval-Augmented Generation (RAG)** pipelines using [Dify](https://github.com/langgenius/dify) — an open-source LLM application platform.
 
 The focus is the *testing* side: how RAG systems fail, how to measure quality, and how to build a repeatable test suite against a real pipeline.
@@ -75,7 +80,7 @@ rag-demo/
 │   ├── testing/
 │   │   ├── test-strategy.md                  # One-page test strategy for the RAG pipeline
 │   │   ├── rag-evaluation-playbook.md        # How to execute evaluation — metrics, A/B testing
-│   │   ├── functional-test-scenarios.md      # 74 functional test cases
+│   │   ├── functional-test-scenarios.md      # 89 functional test cases across 15 categories
 │   │   ├── chunking-strategies.md            # Chunk size, overlap, strategy — failure modes + how to measure
 │   │   ├── ragas-intro.md                    # How RAGAS TestsetGenerator works — components, flow
 │   │   ├── ragas-evaluation-metrics.md       # Faithfulness, Answer Relevancy, Context Precision, Context Recall
@@ -200,30 +205,42 @@ docker compose up -d          # start again
 
 ## Troubleshooting
 
-**http://localhost shows nothing / connection refused**
+<details>
+<summary><strong>http://localhost shows nothing / connection refused</strong></summary>
+
 The API takes 1–2 minutes on first boot to run migrations. Wait, refresh, then check:
 ```bash
 docker compose logs api --tail=50
 ```
+</details>
 
-**A container keeps restarting**
+<details>
+<summary><strong>A container keeps restarting</strong></summary>
+
 ```bash
 docker compose ps              # identify which container
 docker compose logs <name>     # read the error
 ```
 Common causes: insufficient RAM allocated to Docker, or a port conflict on 80/443.
+</details>
 
-**Port 80 already in use**
+<details>
+<summary><strong>Port 80 already in use</strong></summary>
+
 In `.env`, set `EXPOSE_NGINX_PORT=8080`, then:
 ```bash
 docker compose down && docker compose up -d
 ```
 Access Dify at **http://localhost:8080**
+</details>
 
-**Out of disk space**
+<details>
+<summary><strong>Out of disk space</strong></summary>
+
 ```bash
 docker system prune            # remove unused images and containers
 ```
+</details>
 
 ---
 
