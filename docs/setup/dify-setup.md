@@ -351,4 +351,4 @@ With a working chatbot and an API key, you can:
 - Measure answer quality with **BLEU, ROUGE-L, and GPTScore**
 - Experiment with different chunking settings and compare scores
 
-See the [main README](../README.md#testing-rag-applications) for the testing guide.
+See the [main README](../../README.md#testing-the-pipeline) for the testing guide.

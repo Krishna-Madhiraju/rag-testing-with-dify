@@ -13,7 +13,7 @@ This document covers the generation side. For how each evaluation metric works m
 
 The `TestsetGenerator` is RAGAS's built-in tool for generating a golden dataset from your documents. It combines two LLMs and an embeddings model to produce diverse, quality-filtered question / answer / chunk triples — without you writing filter logic or hand-crafting every question.
 
-This is Approach 3 from the [Golden Dataset Guide](golden-dataset-guide.md): fully automated generation with built-in quality scoring. It is the recommended starting point for knowledge bases with more than five documents.
+This is Approach 3 from the [Golden Dataset Guide](../../golden-dataset/guide.md): fully automated generation with built-in quality scoring. It is the recommended starting point for knowledge bases with more than five documents.
 
 ---
 
@@ -189,7 +189,7 @@ RAGAS returns a `TestDataset` object. Convert it to a DataFrame to inspect or ex
 | `reference_contexts` | The source chunk(s) used | `expected_chunk` |
 | `synthesizer_name` | Question type: `single_hop`, `multi_hop`, `reasoning` | `query_type` |
 
-Rename these columns to match the `question / reference_answer / expected_chunk / source_doc` structure from the [Golden Dataset Guide](golden-dataset-guide.md) so all your tooling works consistently across manual and synthetic rows.
+Rename these columns to match the `question / reference_answer / expected_chunk / source_doc` structure from the [Golden Dataset Guide](../../golden-dataset/guide.md) so all your tooling works consistently across manual and synthetic rows.
 
 After exporting to CSV, add your manual out-of-scope, fictitious entity, and adversarial rows. Those are not in the RAGAS output and must be appended by hand.
 
@@ -232,4 +232,4 @@ The RAGAS output covers in-scope questions only. A complete golden dataset adds 
 
 Merge both into a single CSV. The manual rows are small in number but critical for release gate testing — they are the only rows that measure hallucination rate and refusal behaviour.
 
-See [Golden Dataset Guide](golden-dataset-guide.md) for the full dataset structure, quality checklist, and how to use the dataset for regression testing.
+See [Golden Dataset Guide](../../golden-dataset/guide.md) for the full dataset structure, quality checklist, and how to use the dataset for regression testing.

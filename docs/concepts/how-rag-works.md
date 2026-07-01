@@ -228,6 +228,6 @@ You'll go deep on this in the [RAG Evaluation Playbook](../testing/rag-evaluatio
 
 1. **[Glossary](glossary.md)** — quick definitions for every term above.
 2. **[Dify Setup](../setup/dify-setup.md)** — get a real pipeline running locally.
-3. **[Your First Evaluation](../testing/first-evaluation.md)** — build a tiny golden dataset, run it, score it, record a baseline.
+3. **[Your First Evaluation](../../golden-dataset/first-evaluation.md)** — build a tiny golden dataset, run it, score it, record a baseline.
 4. **[Test Strategy](../testing/test-strategy.md)** and the **[Evaluation Playbook](../testing/rag-evaluation-playbook.md)** — the full testing picture.
 5. **[Further Resources](../going-further/resources.md)** — curated external reading: surveys, frameworks, leaderboards, and primary sources.
