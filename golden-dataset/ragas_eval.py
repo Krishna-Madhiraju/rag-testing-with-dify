@@ -16,11 +16,16 @@ The four metrics:
   Context Recall    — did the retriever find everything needed for the reference answer?
                       Catches missed chunks.
 
-Prerequisites:
-  python3.11 -m pip install "ragas<0.2" datasets openai langchain-openai
+LLM judge and embeddings:
+  This script uses Claude (via ANTHROPIC_API_KEY — the same key as score_results.py)
+  as the RAGAS judge, and a free local sentence-transformers model for the
+  embedding-based Answer Relevancy metric. No OpenAI key or spend required.
 
-  Requires OPENAI_API_KEY in your .env file (RAGAS uses OpenAI internally for
-  its LLM judge calls). The same key you use for Dify works here.
+Prerequisites:
+  python3.11 -m pip install ragas sentence-transformers anthropic
+
+Setup:
+  Add ANTHROPIC_API_KEY=sk-ant-... to your .env file (same key used by score_results.py).
 
 Usage:
   python3.11 golden-dataset/ragas_eval.py                        # scores runs/run-001.csv
@@ -39,13 +44,13 @@ Output:
   golden-dataset/runs/ragas-summary.md   — averages by query type
 
 Notes on cost:
-  RAGAS makes one or more LLM calls per sample per metric. With 21 rows and
-  four metrics you will spend roughly $0.02–$0.05 on gpt-4o-mini. Context
-  Precision and Context Recall also require a reference answer — out-of-scope
-  and fictitious-entity rows are skipped for those two metrics.
+  The Claude judge calls cost a small amount per row per metric (Haiku pricing).
+  The local embedding model (sentence-transformers/all-MiniLM-L6-v2) runs on your
+  machine and is free, but downloads ~90 MB the first time it's used.
 """
 
 import csv
+import math
 import os
 import sys
 
@@ -86,25 +91,51 @@ def load_dotenv(path=".env"):
 load_dotenv()
 
 # --------------------------------------------------------------------------
+# Compatibility shim: recent langchain-community releases dropped the
+# chat_models.vertexai submodule, but ragas 0.4.x still imports ChatVertexAI
+# at module load time for an unused legacy type-check list. We don't use
+# VertexAI, so a stub class satisfies the import without needing Google's SDK.
+# --------------------------------------------------------------------------
+import sys as _sys
+import types as _types
+try:
+    import langchain_community.chat_models.vertexai  # noqa: F401
+except ModuleNotFoundError:
+    _stub = _types.ModuleType("langchain_community.chat_models.vertexai")
+    _stub.ChatVertexAI = type("ChatVertexAI", (), {})
+    _sys.modules["langchain_community.chat_models.vertexai"] = _stub
+
+# --------------------------------------------------------------------------
 # Dependency check
 # --------------------------------------------------------------------------
 try:
-    from datasets import Dataset
-except ImportError:
-    sys.exit("Missing: pip install datasets")
+    from ragas import evaluate
+    from ragas.dataset_schema import EvaluationDataset
+    from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
+    from ragas.llms import llm_factory
+    # ragas.embeddings.HuggingfaceEmbeddings (the legacy, sync-only wrapper that would
+    # otherwise match the answer_relevancy/faithfulness metrics used below) ships
+    # incomplete in ragas 0.4.3 — it never implements the required aembed_query/
+    # aembed_documents methods, so it can't even be instantiated. Instead we use
+    # LangChain's own local HuggingFace embeddings class (which gets working async
+    # methods for free via LangChain's base Embeddings executor default) and adapt it
+    # with ragas's LangchainEmbeddingsWrapper.
+    from langchain_community.embeddings import HuggingFaceEmbeddings as LCHuggingFaceEmbeddings
+    from ragas.embeddings import LangchainEmbeddingsWrapper
+except ImportError as e:
+    sys.exit(f"Missing dependency: {e}\nRun: pip install ragas sentence-transformers anthropic")
 
 try:
-    from ragas import evaluate
-    from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
+    from anthropic import Anthropic
 except ImportError:
-    sys.exit('Missing: pip install "ragas<0.2"')
+    sys.exit("Missing: pip install anthropic")
 
-OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
-if not OPENAI_KEY or "your-key" in OPENAI_KEY:
+ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+if not ANTHROPIC_KEY or "your-key" in ANTHROPIC_KEY:
     sys.exit(
-        "OPENAI_API_KEY not set.\n"
-        "RAGAS uses OpenAI internally for its LLM judge calls.\n"
-        "Add OPENAI_API_KEY=sk-... to your .env file and re-run."
+        "ANTHROPIC_API_KEY not set.\n"
+        "This script uses Claude as the RAGAS judge (same key as score_results.py).\n"
+        "Add ANTHROPIC_API_KEY=sk-ant-... to your .env file and re-run."
     )
 
 # --------------------------------------------------------------------------
@@ -119,7 +150,7 @@ IN_SCOPE_TYPES = {"factual", "paraphrase", "multi-hop", "comparative"}
 def parse_chunks(pipe_separated: str) -> list:
     """
     Convert the pipe-separated retrieved_chunks field from the CSV back into
-    a list of strings that RAGAS expects for 'contexts'.
+    a list of strings that RAGAS expects for 'retrieved_contexts'.
     """
     if not pipe_separated:
         return []
@@ -129,14 +160,14 @@ def parse_chunks(pipe_separated: str) -> list:
 # --------------------------------------------------------------------------
 # Build RAGAS dataset
 # --------------------------------------------------------------------------
-def build_ragas_dataset(rows: list) -> tuple[Dataset, list[int]]:
+def build_ragas_dataset(rows: list) -> tuple:
     """
-    Convert golden-dataset run rows into a HuggingFace Dataset for RAGAS.
+    Convert golden-dataset run rows into a RAGAS EvaluationDataset.
 
     Returns (dataset, original_indices) so results can be mapped back to rows.
     Only includes in-scope rows that have both an actual_answer and retrieved chunks.
     """
-    questions, answers, contexts, ground_truths, original_indices = [], [], [], [], []
+    samples, original_indices = [], []
 
     for i, row in enumerate(rows):
         qt = row.get("query_type", "").strip().lower()
@@ -151,19 +182,15 @@ def build_ragas_dataset(rows: list) -> tuple[Dataset, list[int]]:
         if not chunks:
             continue
 
-        questions.append(row["question"])
-        answers.append(actual)
-        contexts.append(chunks)
-        ground_truths.append(reference)
+        samples.append({
+            "user_input": row["question"],
+            "response": actual,
+            "retrieved_contexts": chunks,
+            "reference": reference,
+        })
         original_indices.append(i)
 
-    dataset = Dataset.from_dict({
-        "question": questions,
-        "answer": answers,
-        "contexts": contexts,
-        "ground_truth": ground_truths,
-    })
-
+    dataset = EvaluationDataset.from_list(samples)
     return dataset, original_indices
 
 
@@ -204,6 +231,7 @@ def write_summary(rows_with_scores: list, scored_indices: set) -> None:
     lines = [
         "# RAGAS Evaluation Summary\n",
         f"Input: {INPUT_FILE}\n",
+        f"Judge LLM: Claude (claude-haiku-4-5-20251001) | Embeddings: local sentence-transformers/all-MiniLM-L6-v2\n",
         f"Rows evaluated: {len(scored_indices)} in-scope rows with actual answers\n",
     ]
 
@@ -215,7 +243,9 @@ def write_summary(rows_with_scores: list, scored_indices: set) -> None:
         for r in rows_with_scores:
             v = r.get(col, "")
             try:
-                vals.append(float(v))
+                fv = float(v)
+                if not math.isnan(fv):
+                    vals.append(fv)
             except (ValueError, TypeError):
                 pass
         avg = sum(vals) / len(vals) if vals else None
@@ -234,7 +264,9 @@ def write_summary(rows_with_scores: list, scored_indices: set) -> None:
             vals = []
             for r in subset:
                 try:
-                    vals.append(float(r.get(col, "")))
+                    fv = float(r.get(col, ""))
+                    if not math.isnan(fv):
+                        vals.append(fv)
                 except (ValueError, TypeError):
                     pass
             avg = sum(vals) / len(vals) if vals else None
@@ -279,18 +311,27 @@ def main():
         )
 
     print(f"Scoring {n_scoreable} in-scope rows (out-of-scope rows are skipped)...")
-    print("This will make several OpenAI API calls — allow 30–90 seconds.\n")
+    print("Judge: Claude (claude-haiku-4-5-20251001)  |  Embeddings: local sentence-transformers (first run downloads ~90MB)")
+    print("This will take a couple of minutes.\n")
 
-    result = evaluate(ragas_dataset, metrics=metrics)
+    judge_llm = llm_factory("claude-haiku-4-5-20251001", provider="anthropic", client=Anthropic(api_key=ANTHROPIC_KEY))
+    # Anthropic's API rejects requests that set both temperature and top_p, but
+    # ragas's InstructorModelArgs defaults both. Drop top_p to keep temperature only.
+    judge_llm.model_args.pop("top_p", None)
+    local_embeddings = LangchainEmbeddingsWrapper(
+        LCHuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    )
+
+    result = evaluate(ragas_dataset, metrics=metrics, llm=judge_llm, embeddings=local_embeddings)
     result_df = result.to_pandas()
 
     # Add RAGAS score columns to original rows
-    ragas_cols = [c for c in result_df.columns if c in METRIC_COL_NAMES or c in metric_names]
     for col in result_df.columns:
-        if col not in ("question", "answer", "contexts", "ground_truth"):
+        if col not in ("user_input", "response", "retrieved_contexts", "reference"):
             canonical = METRIC_COL_NAMES.get(col, f"ragas_{col}")
             for df_idx, row_idx in enumerate(original_indices):
-                rows[row_idx][canonical] = round(float(result_df.at[df_idx, col]), 4) if result_df.at[df_idx, col] is not None else ""
+                val = result_df.at[df_idx, col]
+                rows[row_idx][canonical] = round(float(val), 4) if val is not None else ""
 
     # Ensure all rows have the RAGAS columns (unscorable rows get blank)
     scored_indices = set(original_indices)
