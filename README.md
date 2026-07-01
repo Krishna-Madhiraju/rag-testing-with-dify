@@ -65,6 +65,12 @@ rag-demo/
 │   ├── reference/
 │   │   ├── llm-api-cost-comparison.md          # Frontier vs. open-source-serving LLM API pricing, free tiers, Dify compatibility
 │   │   └── embedding-model-pricing-comparison.md  # Embedding API cost, dimensions, and quality comparison
+│   ├── python-for-testers/
+│   │   ├── bleu-rouge-code-walkthrough.md      # Line-by-line Python + library walkthrough of score_bleu_rouge.py, for non-coders
+│   │   ├── run-evaluation-code-walkthrough.md  # Line-by-line walkthrough of run_evaluation.py
+│   │   ├── gptscore-code-walkthrough.md        # Line-by-line walkthrough of score_gptscore.py
+│   │   ├── ragas-eval-code-walkthrough.md      # Line-by-line walkthrough of ragas_eval.py
+│   │   └── support-scripts-code-walkthrough.md # Walkthrough of generate_handbook.py
 │   ├── testing/
 │   │   ├── test-strategy.md                  # One-page test strategy for the RAG pipeline
 │   │   ├── rag-evaluation-playbook.md        # How to execute evaluation — metrics, A/B testing
@@ -99,9 +105,11 @@ rag-demo/
 │   ├── gptscore/                        # GPTScore (Claude as judge) — self-contained
 │   │   ├── score_gptscore.py                  # Script: reads runs/run-001.csv, never modifies it
 │   │   └── results/                           # This tool's own scored CSV + summary
-│   └── ragas/                           # RAGAS (Faithfulness, Answer Relevancy, Context Precision/Recall) — self-contained
-│       ├── ragas_eval.py                      # Script: reads runs/run-001.csv, never modifies it
-│       └── results/                           # This tool's own scored CSV + summary
+│   ├── ragas/                           # RAGAS (Faithfulness, Answer Relevancy, Context Precision/Recall) — self-contained
+│   │   ├── ragas_eval.py                      # Script: reads runs/run-001.csv, never modifies it
+│   │   └── results/                           # This tool's own scored CSV + summary
+│   └── findings.md                      # Cross-metric synthesis — where BLEU/ROUGE, GPTScore, and RAGAS agree and disagree
+├── LICENSE
 └── README.md
 ```
 
@@ -165,23 +173,15 @@ This is the core focus of the project. The system under test is the **Orion HR A
 | **Adversarial robustness** | Prompt injection, jailbreaks, boundary probes | Red-team test cases |
 | **Chunking sensitivity** | Answer quality changes when chunk size / overlap changes | A/B config comparison |
 
-### API test (run from terminal)
+Full reading list, in suggested order: see [Resources](#resources) below.
+
+**Running the golden-dataset scripts:** `run_evaluation.py`, `score_gptscore.py`, and `ragas_eval.py` need real API keys. Copy the template and fill it in:
 
 ```bash
-APP_API_KEY="your-api-key-here"   # App → API Access → API Key in Dify UI
-
-curl -X POST http://localhost/v1/chat-messages \
-  -H "Authorization: Bearer $APP_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "What is the annual leave policy?",
-    "response_mode": "blocking",
-    "user": "test-user-1",
-    "conversation_id": ""
-  }'
+cp .env.example .env      # in the project root — separate from dify/docker/.env
 ```
 
-Full reading list, in suggested order: see [Resources](#resources) below.
+`.env` needs `DIFY_API_KEY` (Dify UI → your App → API Access) and `ANTHROPIC_API_KEY` (console.anthropic.com). This root `.env` is gitignored (`.env` and `*.env` in `.gitignore`) and never committed — only the placeholder `.env.example` is tracked.
 
 ---
 
@@ -262,10 +262,18 @@ A suggested reading order — concepts first, then set up, then test:
   - `bleu-rouge/score_bleu_rouge.py` → `bleu-rouge/results/`
   - `gptscore/score_gptscore.py` → `gptscore/results/`
   - `ragas/ragas_eval.py` → `ragas/results/`
+- Step 3 — [Cross-Metric Findings](golden-dataset/findings.md): the three scoring tools never read each other's output, but read side by side they disagree in two specific, informative ways (and agree in a third that's the sharpest finding of the run)
 
 **6 · Going further (optional)**
 - [Further Resources](docs/going-further/resources.md) — curated external reading: surveys, frameworks, leaderboards, primary sources
 - [Quiz 1](docs/going-further/quizzes/rag-testing-quiz.md) · [Quiz 2](docs/going-further/quizzes/rag-testing-quiz-2.md) · [Quiz 3](docs/going-further/quizzes/rag-testing-quiz-3.md) — self-check on pipeline, metrics, and retrieval internals
+
+**7 · Python for testers (optional)** — line-by-line Python + library explanations of the golden-dataset scripts, for readers learning Python on the fly. Not RAG-specific; skip this section if you're already comfortable reading Python. Read in this order:
+1. [`run_evaluation.py`](docs/python-for-testers/run-evaluation-code-walkthrough.md)
+2. [`score_bleu_rouge.py`](docs/python-for-testers/bleu-rouge-code-walkthrough.md)
+3. [`score_gptscore.py`](docs/python-for-testers/gptscore-code-walkthrough.md)
+4. [`ragas_eval.py`](docs/python-for-testers/ragas-eval-code-walkthrough.md) (most advanced — read the other three first)
+5. [`generate_handbook.py`](docs/python-for-testers/support-scripts-code-walkthrough.md) (supporting script)
 
 ### External
 - [Dify Documentation](https://docs.dify.ai)
@@ -276,5 +284,7 @@ A suggested reading order — concepts first, then set up, then test:
 > More curated external links — surveys, the MTEB leaderboard, security references — are in [docs/going-further/resources.md](docs/going-further/resources.md).
 
 ---
+
+Licensed under [MIT](LICENSE).
 
 *Built for learning and sharing. If this helped you, feel free to star the repo or connect on LinkedIn.*
