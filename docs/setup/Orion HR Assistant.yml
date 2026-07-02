@@ -1,0 +1,424 @@
+app:
+  description: An AI assistant that answers questions about Orion Technologies employee
+    policies, benefits, and HR procedures using the official employee handbook.
+  icon: 🤖
+  icon_background: '#D1E9FF'
+  icon_type: emoji
+  mode: advanced-chat
+  name: Orion HR Assistant
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/gemini:0.8.5@1d87ec973e00f07093a3d3e894906f61545430554c4c98ae9b76ecb53414a488
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/anthropic:0.3.23@820c7c80e189f0b74458408c80e18c8c7988dc7d8d1bf34e919f64bba30e2792
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 20
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: '👋 Hi there! I''m your Dify product assistant.
+
+
+      Here''s what you can ask me about:
+
+      - What Dify is and what it can do
+
+      - Use cases and who it''s built for
+
+      - Pricing and plans
+
+      - How to get started'
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 1711528914102-1711528915811
+      source: '1711528914102'
+      sourceHandle: source
+      target: '1711528915811'
+      targetHandle: target
+      type: custom
+    - data:
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1711528915811-1711528917469
+      source: '1711528915811'
+      sourceHandle: source
+      target: '1711528917469'
+      targetHandle: target
+      type: custom
+    - data:
+        sourceType: llm
+        targetType: answer
+      id: 1711528917469-1711528919501
+      source: '1711528917469'
+      sourceHandle: source
+      target: '1711528919501'
+      targetHandle: target
+      type: custom
+    nodes:
+    - data:
+        desc: The user's question comes in here.
+        selected: false
+        title: Start
+        type: start
+        variables: []
+      height: 101
+      id: '1711528914102'
+      position:
+        x: -378.7066671965566
+        y: 2613.5
+      positionAbsolute:
+        x: -378.7066671965566
+        y: 2613.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        dataset_ids:
+        - onRvtjCq4xN0NhHq9ea5KuhS+OSDQMWTeo/Cas0if0lZxlVkMB633n1smihH4oHe
+        - ee/Yrb1M1b7Kivrc2E17cMtyZTfoFDSdh+yV+TFwd6U82Vr++9fyuvZ+VjafUe6i
+        desc: Search your knowledge base to find the most relevant content for user's
+          question.
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: weighted_score
+          score_threshold: null
+          top_k: 5
+          weights:
+            keyword_setting:
+              keyword_weight: 0
+            vector_setting:
+              embedding_model_name: gemini-embedding-001
+              embedding_provider_name: langgenius/gemini/google
+              vector_weight: 1
+            weight_type: customized
+        query_attachment_selector: []
+        query_variable_selector:
+        - '1711528914102'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        single_retrieval_config:
+          model:
+            completion_params:
+              frequency_penalty: 0
+              max_tokens: 512
+              presence_penalty: 0
+              temperature: 0
+              top_p: 1
+            mode: chat
+            name: gpt-3.5-turbo
+            provider: openai
+        title: 🌟 Knowledge Retrieval
+        type: knowledge-retrieval
+      dragging: false
+      height: 150
+      id: '1711528915811'
+      position:
+        x: 145.0871667605744
+        y: 2634.5
+      positionAbsolute:
+        x: 145.0871667605744
+        y: 2634.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1711528915811'
+          - result
+        desc: Turn retrieved content into a clear and helpful answers with AI.
+        memory:
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            temperature: 0.5
+          mode: chat
+          name: claude-haiku-4-5-20251001
+          provider: langgenius/anthropic/anthropic
+        prompt_template:
+        - id: 943448fa-b145-4ae7-a485-d77e4a2cc77b
+          role: system
+          text: "You are a knowledgeable assistant. Answer the user's question using\
+            \ the information provided in the {{#context#}}.\n\nGuidelines:\n  You\
+            \ are an HR assistant for Orion Technologies. Answer questions using only\
+            \ the provided context from the employee handbook.\n  If the answer is\
+            \ not in the context, say: \"I don't know based on the provided documents.\"\
+            \n  Do not add information that is not in the context. Do not make assumptions."
+        selected: false
+        title: LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 132
+      id: '1711528917469'
+      position:
+        x: 646.4497561136824
+        y: 2634.5
+      positionAbsolute:
+        x: 646.4497561136824
+        y: 2634.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1711528917469.text#}}'
+        desc: Send the final response back to the user.
+        selected: false
+        title: Answer
+        type: answer
+        variables: []
+      height: 147
+      id: '1711528919501'
+      position:
+        x: 1115.278701218825
+        y: 2634.5
+      positionAbsolute:
+        x: 1115.278701218825
+        y: 2634.5
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        author: Anne
+        desc: ''
+        height: 207
+        selected: false
+        showAuthor: false
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"👋 Welcome to your RAG-Powered Chatbot","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          16px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textStyle":"font-size:
+          16px;","textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          16px;","text":"This is a basic RAG","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":" (Retrieval-Augmented Generation) chatflow. It lets your
+          app answer questions by searching your own knowledge base first, then letting
+          an LLM craft a helpful reply. ","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          16px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textStyle":"font-size:
+          14px;","textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"🎉 Feel free to swap in your own docs and change different
+          models to give it a test.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textStyle":"font-size:
+          14px;","textFormat":0}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+        theme: yellow
+        title: ''
+        type: ''
+        width: 596
+      height: 207
+      id: '1776409425757'
+      position:
+        x: -1044.67170943356
+        y: 2550.0855416746717
+      positionAbsolute:
+        x: -1044.67170943356
+        y: 2550.0855416746717
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 596
+    - data:
+        author: Anne
+        desc: ''
+        height: 311
+        selected: false
+        showAuthor: false
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"📖  Knowledge Retrieval","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          16px;"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"This node searches your knowledge base for content relevant
+          to the user''s question and passes the results to the LLM. ","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textStyle":"font-size:
+          14px;","textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"How ","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"1. Click this node, and navigate to knowledge session in
+          the right panel.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"2. Click \"+\" to add knowledge base for this chatflow.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textStyle":"font-size:
+          14px;","textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"Don''t have a knowledge base yet? No worries, here''s a quick
+          guide.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"📖  ","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"link","version":1,"rel":null,"target":"_blank","title":null,"url":"https://docs.dify.ai/en/use-dify/knowledge/create-knowledge/introduction"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"https://docs.dify.ai/en/use-dify/knowledge/create-knowledge/introduction","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"link","version":1,"rel":"noreferrer","target":null,"title":null,"url":"https://docs.dify.ai/en/use-dify/knowledge/create-knowledge/introduction"}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textStyle":"font-size:
+          14px;","textFormat":0},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textStyle":"font-size:
+          14px;","textFormat":0}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 681
+      height: 311
+      id: '1776409658189'
+      position:
+        x: -67.8443683246893
+        y: 2286.1444598126695
+      positionAbsolute:
+        x: -67.8443683246893
+        y: 2286.1444598126695
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 681
+    - data:
+        author: Anne
+        desc: ''
+        height: 208
+        selected: false
+        showAuthor: false
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"What''s Next","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          16px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          14px;"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"Click Preview to do several rounds of testing, and see if
+          chatbot reponds with correct answer. Besides, you can also:","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textStyle":"font-size:
+          14px;","textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"• Add an ","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          14px;","text":"If/Else","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":" node to handle off-topic questions gracefully","type":"text","version":1},{"type":"linebreak","version":1},{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"• Add more knowledge bases to handle different questions","type":"text","version":1},{"type":"linebreak","version":1},{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"• Customise the LLM''s system prompt for your use case","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+        theme: green
+        title: ''
+        type: ''
+        width: 566
+      height: 208
+      id: '1776409997347'
+      position:
+        x: 1458.960854465164
+        y: 2550.0855416746717
+      positionAbsolute:
+        x: 1458.960854465164
+        y: 2550.0855416746717
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 566
+    - data:
+        author: Anne
+        desc: ''
+        height: 302
+        selected: false
+        showAuthor: false
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"Important: Don''t forget to connect your knowledge base!","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          16px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          16px;"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"Before this workflow can answer questions, make sure the
+          LLM node is properly linked to your knowledge base in two places:","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          14px;"},{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          14px;","text":"1. Context section","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":" — click the Context field and select ","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          14px;","text":"Knowledge Retrieval / result","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":" as the variable. This feeds your docs into the LLM.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          14px;"},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"2. ","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          14px;","text":"System prompt","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":" — make sure the ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"font-size:
+          14px;","text":"{context}","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":" variable appears in your system prompt. This is where the
+          retrieved content gets injected into the conversation.","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textStyle":"font-size:
+          14px;","textFormat":0},{"children":[{"detail":0,"format":0,"mode":"normal","style":"font-size:
+          14px;","text":"Both steps are needed — skipping either one means the LLM
+          won''t have access to your knowledge base. ","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":"font-size:
+          14px;"},{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          16px;"}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 641
+      height: 302
+      id: '1776410462798'
+      position:
+        x: 422.62931996188524
+        y: 2805.069546877318
+      positionAbsolute:
+        x: 422.62931996188524
+        y: 2805.069546877318
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 641
+    viewport:
+      x: 361.9270723700573
+      y: -1096.0187380209663
+      zoom: 0.5622299623415681
+  rag_pipeline_variables: []

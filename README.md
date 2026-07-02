@@ -67,7 +67,8 @@ rag-demo/
 │   │   ├── how-rag-works.md             # START HERE — the RAG pipeline + test implications
 │   │   └── glossary.md                  # RAG terminology reference
 │   ├── setup/
-│   │   └── dify-setup.md                # Step-by-step Dify configuration guide
+│   │   ├── dify-setup.md                # Step-by-step Dify configuration guide
+│   │   └── Orion HR Assistant.yml       # Exported DSL config for the Orion HR Assistant Chatflow
 │   ├── reference/
 │   │   ├── llm-api-cost-comparison.md          # Frontier vs. open-source-serving LLM API pricing, free tiers, Dify compatibility
 │   │   └── embedding-model-pricing-comparison.md  # Embedding API cost, dimensions, and quality comparison
@@ -254,6 +255,7 @@ A suggested reading order — concepts first, then set up, then test:
 
 **2 · Set up the pipeline**
 - [Dify Setup Guide](docs/setup/dify-setup.md) — step-by-step Dify configuration
+- [Orion HR Assistant DSL export](<docs/setup/Orion HR Assistant.yml>) — exported Chatflow config (node graph, prompts, model settings); see [DSL Export/Import](docs/setup/dify-setup.md#sharing-this-setup-dsl-exportimport) for what does and doesn't travel with it
 - [LLM API Cost Comparison](docs/reference/llm-api-cost-comparison.md) — frontier vs. open-source-serving providers, pricing, free tiers, and Dify plugin compatibility (useful if you hit Gemini's free-tier rate limits)
 - [Embedding Model API Comparison](docs/reference/embedding-model-pricing-comparison.md) — embedding API cost, dimensions, and quality across providers
 
